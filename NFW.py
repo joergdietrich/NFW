@@ -67,6 +67,12 @@ class NFW(object):
             r_Delta = float(size)
         else:
             raise InvalidNFWValue(size_type)
+        # The following line is wrong. It causes the mass_consistency
+        # test to fail because it is based on r_200, not a general
+        # r_Delta (I think ...) Or should the scale radius be defined
+        # this way. Then the concentration parameter needs to be
+        # adapted and the test needs to be rewritten. No, NFW define
+        # r_s as r200/c.
         self.r_s = r_Delta / c
         return
 

@@ -2,6 +2,7 @@ import numpy as np
 from numpy.testing import (TestCase, assert_array_equal, assert_equal,
                            assert_almost_equal, assert_array_almost_equal, 
                            assert_raises)
+from numpy.testing.decorators import knownfailureif
 
 from NFW import NFW
 
@@ -75,3 +76,21 @@ class TestNFW(TestCase):
         ds = nfw.delta_sigma(1.12)
         assert_almost_equal(ds/1e14, 1.381662, 6)
         
+    @knownfailureif(True)
+    def test_mass_consistency(self):
+        m200 = 1e15
+        c = 5.
+        z = 0.3
+        nfw = NFW(m200, c, z)
+        m500 = nfw.mass_Delta(500)
+        nfw2 = NFW(m500, c, z, overdensity=500)
+        assert_almost_equal(nfw2.mass_Delta(200)/1e14, m200/1e14, 6)
+
+    def test_radius_mass_consistency(self):
+        m200 = 1e15
+        c = 5.
+        z = 0.3
+        nfw = NFW(m200, c, z)
+        r200 = nfw.radius_Delta(200)
+        nfw2 = NFW(r200, c, z, size_type="radius")
+        assert_almost_equal(nfw2.mass_Delta(200)/1e14, m200/1e14, 6)
