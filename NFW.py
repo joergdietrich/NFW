@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import math
+
 import numpy as np
 from numpy.lib import scimath as sm
 import scipy.constants
@@ -58,6 +60,7 @@ class NFW(object):
         self.rho_c *= 1e12 * scipy.constants.parsec / 1.98892e30
         self.delta_s = overdensity / 3. * self.c**3 / \
                        (np.log(1. + c) - c /(1. + c))
+        self.delta_c = 200. / 3. * self.c**3 / (np.log(1. + c) - c /(1. + c))
         self.rho_s = self.delta_s * self.rho_c
         
         if size_type == "mass":
@@ -67,15 +70,27 @@ class NFW(object):
             r_Delta = float(size)
         else:
             raise InvalidNFWValue(size_type)
+        self.r_s= self.rDelta2rs(r_Delta, overdensity)
         # The following line is wrong. It causes the mass_consistency
         # test to fail because it is based on r_200, not a general
         # r_Delta (I think ...) Or should the scale radius be defined
         # this way. Then the concentration parameter needs to be
         # adapted and the test needs to be rewritten. No, NFW define
         # r_s as r200/c.
-        self.r_s = r_Delta / c
+        #self.r_s = r200 / c
         return
 
+    def _conversion(self, rs, r_Delta, overdensity):
+        rs = overdensity  / 3. * r_Delta**3 - \
+            self.delta_c * rs**3 * \
+            (math.log((rs + r_Delta) / rs) - r_Delta / (rs + r_Delta))
+        return rs
+
+    def rDelta2rs(self, r_Delta, overdensity):
+        r200 = opt.newton(self._conversion, r_Delta, 
+                          args=(r_Delta, overdensity))
+        return r200
+        
     def __str__(self):
         prop_str = "NFW halo with concentration %.2g at redshift %.2f:\n\n" \
                    % (self.c, self.z,)
