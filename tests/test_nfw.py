@@ -76,7 +76,6 @@ class TestNFW(TestCase):
         ds = nfw.delta_sigma(1.12)
         assert_almost_equal(ds/1e14, 1.381662, 6)
         
-    @knownfailureif(True)
     def test_mass_consistency(self):
         m200 = 1e15
         c = 5.
