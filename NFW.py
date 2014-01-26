@@ -58,10 +58,7 @@ class NFW(object):
         self.rho_c = 3. * (100 * self.cosmo.hubble(self.z))**2 / \
                      (8. * np.pi * scipy.constants.G)
         self.rho_c *= 1e12 * scipy.constants.parsec / 1.98892e30
-        self.delta_s = overdensity / 3. * self.c**3 / \
-                       (np.log(1. + c) - c /(1. + c))
         self.delta_c = 200. / 3. * self.c**3 / (np.log(1. + c) - c /(1. + c))
-        self.rho_s = self.delta_s * self.rho_c
         
         if size_type == "mass":
             r_Delta = (3. * size /
@@ -71,13 +68,6 @@ class NFW(object):
         else:
             raise InvalidNFWValue(size_type)
         self.r_s= self.rDelta2rs(r_Delta, overdensity)
-        # The following line is wrong. It causes the mass_consistency
-        # test to fail because it is based on r_200, not a general
-        # r_Delta (I think ...) Or should the scale radius be defined
-        # this way. Then the concentration parameter needs to be
-        # adapted and the test needs to be rewritten. No, NFW define
-        # r_s as r200/c.
-        #self.r_s = r200 / c
         return
 
     def _conversion(self, rs, r_Delta, overdensity):
@@ -119,19 +109,20 @@ class NFW(object):
     def density(self, r):
         """Compute the density rho of an NFW halo at radius r (in Mpc)
         from the center of the halo. Returns M_sun/Mpc^3."""
-        return self.rho_s / (r / self.r_s * (1 + r / self.r_s)**2)
+        return self.rho_c * self.delta_c / (r / self.r_s * \
+                                                (1 + r / self.r_s)**2)
 
     def mean_density(self, r):
         """Compute the mean density inside a radius r (in
         Mpc). Returns M_sun/Mpc^3."""
-        return 3. * (self.r_s / r) **3 * self.rho_s * \
+        return 3. * (self.r_s / r) **3 * self.delta_c * self.rho_c * \
                (np.log((1 + r / self.r_s)) - (r / self.r_s) / \
                     (1 + r / self.r_s))
 
     def mass(self, r):
         """Compute the mass of an NFW halo inside radius r (in Mpc)
         from the center of the halo. Returns mass in M_sun."""
-        return 4. * np.pi * self.rho_s * self.r_s**3 * \
+        return 4. * np.pi * self.delta_c * self.rho_c * self.r_s**3 * \
                (np.log((1 + r / self.r_s)) - (r / self.r_s) / \
                 (1 + r / self.r_s))
 
@@ -140,11 +131,11 @@ class NFW(object):
         """Compute the surface mass density of the halo at distance r
         (in Mpc) from the halo center."""
         x = r / self.r_s
-        delta_c = 200 / 3. * self.c**3 / \
-            (np.log(1. + self.c) - self.c  / (1. + self.c))
+        #delta_c = 200 / 3. * self.c**3 / \
+        #    (np.log(1. + self.c) - self.c  / (1. + self.c))
         val1 = 1. / (x**2 - 1.)
         val2 = arcsec(x) / (sm.sqrt(x**2 - 1.))**3
-        return float(2. * self.r_s * self.rho_c * delta_c * \
+        return float(2. * self.r_s * self.rho_c * self.delta_c * \
                          (val1 - val2)).real
 
     def delta_sigma(self, r):
