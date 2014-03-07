@@ -4,7 +4,7 @@ from numpy.testing import (TestCase, assert_array_equal, assert_equal,
                            assert_raises)
 from numpy.testing.decorators import knownfailureif
 
-from NFW import NFW
+from nfw import NFW
 
 class TestNFW(TestCase):
     def test_mass_init(self):
