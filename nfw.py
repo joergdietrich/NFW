@@ -7,8 +7,10 @@ from numpy.lib import scimath as sm
 import scipy.constants
 import scipy.optimize as opt
 
-from cosmology import Cosmology
+#from cosmology import Cosmology
 
+import astropy.cosmology
+from astropy import units as u
 
 def arcsec(z):
     """Compute the inverse sec of the complex number z."""
@@ -33,7 +35,6 @@ class NFW(object):
 
     optional input
 
-    cosmology - "wmap7" or an instance of the Cosmology class
     size_type - "(radius|mass)" specifies whether the halo size is given as
                 radius or mass
     overdensity - the factor above the critical/mean density of the Universe
@@ -41,13 +42,10 @@ class NFW(object):
     overdensity_type = "(critical|mean)"
     """
 
-    def __init__(self, size, c, z, cosmology="wmap7", size_type="mass",
+    def __init__(self, size, c, z, size_type="mass",
                  overdensity=200.,
                  overdensity_type="critical"):
-        if cosmology == "wmap7":
-            self.cosmo = Cosmology(0.272, 0.728, 0.704)
-        else:
-            self.cosmo = cosmology
+        cosmo = astropy.cosmology.get_current()
 
         if overdensity_type != "critical":
             print "You must be kidding."
@@ -57,31 +55,34 @@ class NFW(object):
         self.c = float(c)
         self.z = float(z)
 
-        self.rho_c = 3. * (100 * self.cosmo.hubble(self.z))**2 / \
-            (8. * np.pi * scipy.constants.G)
-        self.rho_c *= 1e12 * scipy.constants.parsec / 1.98892e30
+        self.rho_c = cosmo.critical_density(z)
+        self.rho_c = self.rho_c.to(u.solMass / u.megaparsec**3)
         self.delta_c = 200. / 3. * self.c**3 / (np.log(1. + c) - c / (1. + c))
 
         if size_type == "mass":
-            r_Delta = (3. * size /
-                       (4. * np.pi * overdensity * self.rho_c))**(1./3.)
+            if not isinstance(size, u.Quantity):
+                size *= u.solMass
+            r_Delta = (3. * size \
+                       / (4. * np.pi * overdensity * self.rho_c))**(1./3.)
         elif size_type == "radius":
-            r_Delta = float(size)
+            r_Delta = size
+            if not isinstance(r_Delta, u.Quantity):
+                r_Delta *= u.megaparsec
         else:
             raise InvalidNFWValue(size_type)
         self.r_s = self._rDelta2rs(r_Delta, overdensity)
         return
 
     def _rDelta2r200_zero(self, rs, r_Delta, overdensity):
-        z = overdensity / 3. * r_Delta**3 - \
-            self.delta_c * rs**3 * \
-            (math.log((rs + r_Delta) / rs) - r_Delta / (rs + r_Delta))
-        return z
+        rs *= u.megaparsec
+        z = overdensity / 3. * r_Delta**3 - self.delta_c * rs**3 \
+            * (math.log((rs + r_Delta) / rs) - r_Delta / (rs + r_Delta))
+        return z.value
 
     def _rDelta2rs(self, r_Delta, overdensity):
         r200 = opt.brentq(self._rDelta2r200_zero, 1e-6, 100,
                           args=(r_Delta, overdensity))
-        return r200
+        return r200 * u.megaparsec
 
     def __str__(self):
         prop_str = "NFW halo with concentration %.2g at redshift %.2f:\n\n" \
@@ -93,14 +94,14 @@ class NFW(object):
         return prop_str
 
     def _mean_density_zero(self, r, Delta):
-        return self.mean_density(r) - Delta * self.rho_c
+        return (self.mean_density(r) - Delta * self.rho_c).value
 
     def radius_Delta(self, Delta):
         """Find the radius at which the mean density is Delta times the
         critical density. Returns radius in Mpc."""
         x0 = opt.brentq(self._mean_density_zero, 1e-6, 10,
                         args=(Delta,))
-        return x0
+        return x0 * u.megaparsec
 
     def mass_Delta(self, Delta):
         """Find the mass inside a radius inside which the mean density
@@ -111,37 +112,44 @@ class NFW(object):
     def density(self, r):
         """Compute the density rho of an NFW halo at radius r (in Mpc)
         from the center of the halo. Returns M_sun/Mpc^3."""
-        return self.rho_c * self.delta_c / (r / self.r_s *
-                                            (1 + r / self.r_s)**2)
+        if not isinstance(r, u.Quantity):
+            r *= u.megaparsec
+        return self.rho_c * self.delta_c \
+            / (r / self.r_s * (1 + r / self.r_s)**2)
 
     def mean_density(self, r):
         """Compute the mean density inside a radius r (in
         Mpc). Returns M_sun/Mpc^3."""
-        return 3. * (self.r_s / r)**3 * self.delta_c * self.rho_c * \
-            (np.log((1 + r / self.r_s)) - (r / self.r_s) /
-             (1 + r / self.r_s))
+        if not isinstance(r, u.Quantity):
+            r *= u.megaparsec
+        return 3. * (self.r_s / r)**3 * self.delta_c * self.rho_c \
+            * (np.log((1 + r / self.r_s)) \
+               - (r / self.r_s) / (1 + r / self.r_s))
 
     def mass(self, r):
         """Compute the mass of an NFW halo inside radius r (in Mpc)
         from the center of the halo. Returns mass in M_sun."""
-        return 4. * np.pi * self.delta_c * self.rho_c * self.r_s**3 * \
-            (np.log((1 + r / self.r_s)) - (r / self.r_s) /
-             (1 + r / self.r_s))
+        if not isinstance(r, u.Quantity):
+            r *= u.megaparsec
+        return 4. * np.pi * self.delta_c * self.rho_c * self.r_s**3 \
+            * (np.log((1 + r / self.r_s)) \
+               - (r / self.r_s) / (1 + r / self.r_s))
 
     def sigma(self, r):
         """Compute the surface mass density of the halo at distance r
         (in Mpc) from the halo center."""
+        if not isinstance(r, u.Quantity):
+            r *= u.megaparsec
         x = r / self.r_s
-        #delta_c = 200 / 3. * self.c**3 / \
-        #    (np.log(1. + self.c) - self.c  / (1. + self.c))
         val1 = 1. / (x**2 - 1.)
-        val2 = arcsec(x) / (sm.sqrt(x**2 - 1.))**3
-        return float(2. * self.r_s * self.rho_c * self.delta_c *
-                     (val1 - val2)).real
+        val2 = float((arcsec(x) / (sm.sqrt(x**2 - 1.))**3).real)
+        return 2. * self.r_s * self.rho_c * self.delta_c * (val1 - val2)
 
     def delta_sigma(self, r):
         """Compute the Delta surface mass density of the halo at
         radius r (in Mpc) from the halo center."""
+        if not isinstance(r, u.Quantity):
+            r *= u.megaparsec
         x = r / self.r_s
         delta_c = 200 / 3. * self.c**3 / \
             (np.log(1. + self.c) - self.c / (1. + self.c))
@@ -149,6 +157,6 @@ class NFW(object):
         val1 = 1. / (1. - x**2)
         num = (3. * x**2 - 2) * arcsec(x)
         div = x**2 * (sm.sqrt(x**2 - 1.))**3
-        val2 = num / div
+        val2 = float((num / div).real)
         val3 = 2. * np.log(x / 2.) / x**2
-        return (fac * (val1 + val2 + val3)).real
+        return fac * (val1 + val2 + val3)
