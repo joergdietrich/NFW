@@ -1,4 +1,3 @@
-from nose.tools import *
 import numpy as np
 from numpy.testing import (TestCase, assert_array_equal, assert_equal,
                            assert_almost_equal, assert_array_almost_equal, 

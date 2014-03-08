@@ -7,8 +7,6 @@ from numpy.lib import scimath as sm
 import scipy.constants
 import scipy.optimize as opt
 
-#from cosmology import Cosmology
-
 import astropy.cosmology
 from astropy import units as u
 
