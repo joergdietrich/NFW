@@ -60,8 +60,8 @@ class NFW(object):
             print "Of course overdensities are defined wrt the " \
                 "critical density."
 
-        self.c = float(c)
-        self.z = float(z)
+        self._c = float(c)
+        self._z = float(z)
         self._overdensity = overdensity
         if cosmology:
             self.cosmo = cosmology
@@ -82,10 +82,24 @@ class NFW(object):
         self._size_type = size_type
 
         self._r_Delta = self.r_Delta
-        self.delta_c = 200. / 3. * self.c**3 / (np.log(1. + c) - c / (1. + c))
         self._r_s = self.r_s
 
         return
+
+    @property
+    def c(self):
+        return self._c
+
+    @property
+    def z(self):
+        return self._z
+
+    @property
+    def delta_c(self):
+        """
+        """
+        return 200. / 3. * self.c**3 \
+            / (np.log(1. + self.c) - self.c / (1. + self.c))
 
     @property
     def rho_c(self):
