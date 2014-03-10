@@ -10,12 +10,14 @@ import scipy.optimize as opt
 import astropy.cosmology
 from astropy import units as u
 
+
 def arcsec(z):
     """Compute the inverse sec of the complex number z."""
     val1 = 1j / z
     val2 = sm.sqrt(1 - 1./z**2)
     val = 1.j * np.log(val2 + val1)
     return 0.5 * np.pi + val
+
 
 def unit_checker(x, unit):
     """Check that x has units u. Convert to appropriate units if not.
@@ -28,8 +30,10 @@ def unit_checker(x, unit):
         return x * unit
     return x.to(unit)
 
+
 class InvalidNFWValue(Exception):
     pass
+
 
 class NFW(object):
     """Compute properties of an NFW halo.
@@ -107,7 +111,7 @@ class NFW(object):
         """Critical density at halo redshift
         """
         current_cosmo = astropy.cosmology.get_current()
-        if self.cosmology != current_cosmo or self._rho_c == None:
+        if self.cosmology != current_cosmo or self._rho_c is None:
             self._rho_c = self.cosmology.critical_density(self.z)
             self._rho_c = self.rho_c.to(u.solMass / u.megaparsec**3)
             if self._r_Delta:
@@ -125,9 +129,9 @@ class NFW(object):
         if self._size_type == "mass":
             if self.cosmology != current_cosmo:
                 self._rho_c = self.rho_c
-            self._r_Delta = (3. * self._size \
-                       / (4. * np.pi * self._overdensity \
-                          * self._rho_c))**(1./3.)
+            self._r_Delta = (3. * self._size
+                             / (4. * np.pi * self._overdensity
+                                * self._rho_c))**(1./3.)
         else:
             self._r_Delta = self._size
         return self._r_Delta
@@ -137,7 +141,7 @@ class NFW(object):
         """Scale radius
         """
         current_cosmo = astropy.cosmology.get_current()
-        if self.cosmology != current_cosmo or self._r_s == None:
+        if self.cosmology != current_cosmo or self._r_s is None:
             self._r_Delta = self.r_Delta
             self._r_s = self._rDelta2rs(self._r_Delta, self._overdensity)
             self.cosmology = current_cosmo
@@ -193,7 +197,7 @@ class NFW(object):
         if not isinstance(r, u.Quantity):
             r *= u.megaparsec
         return 3. * (self.r_s / r)**3 * self.delta_c * self.rho_c \
-            * (np.log((1 + r / self.r_s)) \
+            * (np.log((1 + r / self.r_s))
                - (r / self.r_s) / (1 + r / self.r_s))
 
     def mass(self, r):
@@ -202,7 +206,7 @@ class NFW(object):
         if not isinstance(r, u.Quantity):
             r *= u.megaparsec
         return 4. * np.pi * self.delta_c * self.rho_c * self.r_s**3 \
-            * (np.log((1 + r / self.r_s)) \
+            * (np.log((1 + r / self.r_s))
                - (r / self.r_s) / (1 + r / self.r_s))
 
     def sigma(self, r):
