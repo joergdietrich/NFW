@@ -31,7 +31,6 @@ def unit_checker(x, unit):
 class InvalidNFWValue(Exception):
     pass
 
-
 class NFW(object):
     """Compute properties of an NFW halo.
 
@@ -88,22 +87,24 @@ class NFW(object):
 
     @property
     def c(self):
+        """Halo concentration"""
         return self._c
 
     @property
     def z(self):
+        "Halo redshift"""
         return self._z
 
     @property
     def delta_c(self):
-        """
+        """Characterstic overdensity
         """
         return 200. / 3. * self.c**3 \
             / (np.log(1. + self.c) - self.c / (1. + self.c))
 
     @property
     def rho_c(self):
-        """Compute critical density
+        """Critical density at halo redshift
         """
         current_cosmo = astropy.cosmology.get_current()
         if self.cosmology != current_cosmo or self._rho_c == None:
@@ -118,7 +119,7 @@ class NFW(object):
 
     @property
     def r_Delta(self):
-        """
+        """Halo radius at initialization overdensity
         """
         current_cosmo = astropy.cosmology.get_current()
         if self._size_type == "mass":
@@ -133,7 +134,7 @@ class NFW(object):
 
     @property
     def r_s(self):
-        """Compute the scale radius.
+        """Scale radius
         """
         current_cosmo = astropy.cosmology.get_current()
         if self.cosmology != current_cosmo or self._r_s == None:
