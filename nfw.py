@@ -10,12 +10,25 @@ import scipy.optimize as opt
 import astropy.cosmology
 from astropy import units as u
 
+
 def arcsec(z):
     """Compute the inverse sec of the complex number z."""
     val1 = 1j / z
     val2 = sm.sqrt(1 - 1./z**2)
     val = 1.j * np.log(val2 + val1)
     return 0.5 * np.pi + val
+
+
+def unit_checker(x, unit):
+    """Check that x has units u. Convert to appropriate units if not.
+
+    Arguments:
+    - `x`: array_like
+    - `u`: astro.units unit
+    """
+    if not isinstance(x, u.Quantity):
+        return x * unit
+    return x.to(unit)
 
 
 class InvalidNFWValue(Exception):
@@ -38,38 +51,116 @@ class NFW(object):
     overdensity - the factor above the critical/mean density of the Universe
                   at which mass/radius are computed. Default 200
     overdensity_type = "(critical|mean)"
+    cosmology - object, use the current astropy.cosmology if None, otherwise
+                an astropy.cosmology object
     """
 
     def __init__(self, size, c, z, size_type="mass",
                  overdensity=200.,
-                 overdensity_type="critical"):
-        cosmo = astropy.cosmology.get_current()
-
+                 overdensity_type="critical", cosmology=None):
         if overdensity_type != "critical":
             print "You must be kidding."
             print "Of course overdensities are defined wrt the " \
                 "critical density."
 
-        self.c = float(c)
-        self.z = float(z)
-
-        self.rho_c = cosmo.critical_density(z)
-        self.rho_c = self.rho_c.to(u.solMass / u.megaparsec**3)
-        self.delta_c = 200. / 3. * self.c**3 / (np.log(1. + c) - c / (1. + c))
-
-        if size_type == "mass":
-            if not isinstance(size, u.Quantity):
-                size *= u.solMass
-            r_Delta = (3. * size \
-                       / (4. * np.pi * overdensity * self.rho_c))**(1./3.)
-        elif size_type == "radius":
-            r_Delta = size
-            if not isinstance(r_Delta, u.Quantity):
-                r_Delta *= u.megaparsec
+        self._c = float(c)
+        self._z = float(z)
+        self._overdensity = overdensity
+        if cosmology is not None:
+            self._cosmology = cosmology
+            self._var_cosmology = False
         else:
+            self._cosmology = astropy.cosmology.get_current()
+            self._var_cosmology = True
+
+        self._rho_c = None
+        self._r_s = None
+        self._r_Delta = None
+        self._rho_c = self.rho_c
+
+        if size_type not in ['mass', 'radius']:
             raise InvalidNFWValue(size_type)
-        self.r_s = self._rDelta2rs(r_Delta, overdensity)
+        if size_type == "mass":
+            self._size = unit_checker(size, u.solMass)
+        else:
+            self._size = unit_checker(size, u.megaparsec)
+        self._size_type = size_type
+
+        self._r_Delta = self.r_Delta
+        self._r_s = self.r_s
+
         return
+
+    def _update_required(self, attr):
+        """
+        Check whether an attr needs updating due to a new cosmology
+        Arguments:
+        - `attr`: an instance attribute
+        """
+        if attr is None:
+            return True
+        if not self._var_cosmology:
+            return False
+        if self._cosmology == astropy.cosmology.get_current():
+            return False
+        return True
+
+    @property
+    def c(self):
+        """Halo concentration"""
+        return self._c
+
+    @property
+    def z(self):
+        """Halo redshift"""
+        return self._z
+
+    @property
+    def delta_c(self):
+        """Characterstic overdensity
+        """
+        return 200. / 3. * self.c**3 \
+            / (np.log(1. + self.c) - self.c / (1. + self.c))
+
+    @property
+    def rho_c(self):
+        """Critical density at halo redshift
+        """
+        if self._update_required(self._rho_c):
+            if self._var_cosmology:
+                self._cosmology = astropy.cosmology.get_current()
+            self._rho_c = self._cosmology.critical_density(self.z)
+            self._rho_c = self._rho_c.to(u.solMass / u.megaparsec**3)
+            if self._r_Delta is not None:
+                self._r_Delta = self.r_Delta
+            if self._r_s is not None:
+                self._r_s = self.r_s
+        return self._rho_c
+
+    @property
+    def r_Delta(self):
+        """Halo radius at initialization overdensity
+        """
+        if self._size_type == "mass":
+            if self._update_required(self._rho_c):
+                self._rho_c = self.rho_c
+            self._r_Delta = (3. * self._size
+                             / (4. * np.pi * self._overdensity
+                                * self._rho_c))**(1./3.)
+        else:
+            self._r_Delta = self._size
+        return self._r_Delta
+
+    @property
+    def r_s(self):
+        """Scale radius
+        """
+        if self._update_required(self._r_s):
+            self._r_Delta = self.r_Delta
+            self._r_s = self._rDelta2rs(self._r_Delta, self._overdensity)
+            if self._var_cosmology:
+                self._cosmology = astropy.cosmology.get_current()
+        return self._r_s
 
     def _rDelta2r200_zero(self, rs, r_Delta, overdensity):
         rs *= u.megaparsec
@@ -121,7 +212,7 @@ class NFW(object):
         if not isinstance(r, u.Quantity):
             r *= u.megaparsec
         return 3. * (self.r_s / r)**3 * self.delta_c * self.rho_c \
-            * (np.log((1 + r / self.r_s)) \
+            * (np.log((1 + r / self.r_s))
                - (r / self.r_s) / (1 + r / self.r_s))
 
     def mass(self, r):
@@ -130,7 +221,7 @@ class NFW(object):
         if not isinstance(r, u.Quantity):
             r *= u.megaparsec
         return 4. * np.pi * self.delta_c * self.rho_c * self.r_s**3 \
-            * (np.log((1 + r / self.r_s)) \
+            * (np.log((1 + r / self.r_s))
                - (r / self.r_s) / (1 + r / self.r_s))
 
     def sigma(self, r):
