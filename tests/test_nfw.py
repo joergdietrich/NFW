@@ -101,3 +101,42 @@ class TestNFW(TestCase):
         r200 = nfw.radius_Delta(200)
         nfw2 = NFW(r200, c, z, size_type="radius")
         assert_almost_equal(nfw2.mass_Delta(200).value/1e14, m200/1e14, 6)
+
+    def test_mass_unit_consistency(self):
+        m200 = 5e14
+        c = 3
+        z = 0.4
+        nfw1 = NFW(m200, c, z)
+        nfw2 = NFW(m200 * u.solMass, c, z)
+        assert_almost_equal(nfw1.radius_Delta(200), nfw2.radius_Delta(200))
+
+    def test_radius_unit_consistency(self):
+        r200 = 1.5
+        c = 4
+        z = 0.2
+        nfw1 = NFW(r200, c, z, size_type='radius')
+        nfw2 = NFW(r200 * u.megaparsec, c, z, size_type='radius')
+        nfw3 = NFW(r200*1000 * u.kiloparsec, c, z, size_type='radius')
+        assert_almost_equal(nfw1.mass_Delta(200), nfw2.mass_Delta(200))
+        assert_almost_equal(nfw1.mass_Delta(200), nfw3.mass_Delta(200))
+
+    def test_cosmo_consistency(self):
+        save_cosmo = astropy.cosmology.get_current()
+        m200 = 5e14
+        c = 3.5
+        z = 0.15
+        # Halo 1 with variable cosmology
+        nfw1 = NFW(m200, c, z)
+        # Halo 2 with cosmology fixed to the current one
+        nfw2 = NFW(m200, c, z, cosmology=save_cosmo)
+        # Halo 3 with cosmology fixed to WMAP9
+        wmap9 = astropy.cosmology.WMAP9
+        nfw3 = NFW(m200, c, z, cosmology=wmap9)
+
+        assert_almost_equal(nfw1.radius_Delta(200), nfw2.radius_Delta(200))
+        astropy.cosmology.set_current(wmap9)
+        try:
+            assert_almost_equal(nfw1.radius_Delta(200), nfw3.radius_Delta(200))
+        except:
+            astropy.cosmology.set_current(save_cosmo)
+            raise
