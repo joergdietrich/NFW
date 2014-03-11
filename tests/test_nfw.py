@@ -133,10 +133,15 @@ class TestNFW(TestCase):
         wmap9 = astropy.cosmology.WMAP9
         nfw3 = NFW(m200, c, z, cosmology=wmap9)
 
-        assert_almost_equal(nfw1.radius_Delta(200), nfw2.radius_Delta(200))
+        assert_almost_equal(nfw1.radius_Delta(200), nfw2.radius_Delta(200),
+                            err_msg=
+                            "Disagreement after init with same cosmology")
         astropy.cosmology.set_current(wmap9)
         try:
-            assert_almost_equal(nfw1.radius_Delta(200), nfw3.radius_Delta(200))
+            assert_almost_equal(nfw1.radius_Delta(200), nfw3.radius_Delta(200),
+                                err_msg=
+                                "Disagreement after changing cosmology")
         except:
             astropy.cosmology.set_current(save_cosmo)
             raise
+        astropy.cosmology.set_current(save_cosmo)

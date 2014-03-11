@@ -66,10 +66,12 @@ class NFW(object):
         self._c = float(c)
         self._z = float(z)
         self._overdensity = overdensity
-        if cosmology:
-            self.cosmo = cosmology
+        if cosmology is not None:
+            self._cosmology = cosmology
+            self._var_cosmology = False
         else:
-            self.cosmology = astropy.cosmology.get_current()
+            self._cosmology = astropy.cosmology.get_current()
+            self._var_cosmology = True
 
         self._rho_c = None
         self._r_s = None
@@ -89,6 +91,20 @@ class NFW(object):
 
         return
 
+    def _update_required(self, attr):
+        """
+        Check whether an attr needs updating due to a new cosmology
+        Arguments:
+        - `attr`: an instance attribute
+        """
+        if attr is None:
+            return True
+        if not self._var_cosmology:
+            return False
+        if self._cosmology == astropy.cosmology.get_current():
+            return False
+        return True
+
     @property
     def c(self):
         """Halo concentration"""
@@ -96,7 +112,7 @@ class NFW(object):
 
     @property
     def z(self):
-        "Halo redshift"""
+        """Halo redshift"""
         return self._z
 
     @property
@@ -110,24 +126,23 @@ class NFW(object):
     def rho_c(self):
         """Critical density at halo redshift
         """
-        current_cosmo = astropy.cosmology.get_current()
-        if self.cosmology != current_cosmo or self._rho_c is None:
-            self._rho_c = self.cosmology.critical_density(self.z)
-            self._rho_c = self.rho_c.to(u.solMass / u.megaparsec**3)
-            if self._r_Delta:
+        if self._update_required(self._rho_c):
+            if self._var_cosmology:
+                self._cosmology = astropy.cosmology.get_current()
+            self._rho_c = self._cosmology.critical_density(self.z)
+            self._rho_c = self._rho_c.to(u.solMass / u.megaparsec**3)
+            if self._r_Delta is not None:
                 self._r_Delta = self.r_Delta
-            if self._r_s:
+            if self._r_s is not None:
                 self._r_s = self.r_s
-            self.cosmology = current_cosmo
         return self._rho_c
 
     @property
     def r_Delta(self):
         """Halo radius at initialization overdensity
         """
-        current_cosmo = astropy.cosmology.get_current()
         if self._size_type == "mass":
-            if self.cosmology != current_cosmo:
+            if self._update_required(self._rho_c):
                 self._rho_c = self.rho_c
             self._r_Delta = (3. * self._size
                              / (4. * np.pi * self._overdensity
@@ -140,11 +155,11 @@ class NFW(object):
     def r_s(self):
         """Scale radius
         """
-        current_cosmo = astropy.cosmology.get_current()
-        if self.cosmology != current_cosmo or self._r_s is None:
+        if self._update_required(self._r_s):
             self._r_Delta = self.r_Delta
             self._r_s = self._rDelta2rs(self._r_Delta, self._overdensity)
-            self.cosmology = current_cosmo
+            if self._var_cosmology:
+                self._cosmology = astropy.cosmology.get_current()
         return self._r_s
 
     def _rDelta2r200_zero(self, rs, r_Delta, overdensity):
