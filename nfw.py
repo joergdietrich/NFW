@@ -145,9 +145,8 @@ class NFW(object):
         if self._size_type == "mass":
             if self._update_required(self._rho_c):
                 self._rho_c = self.rho_c
-            self._r_Delta = (3*self._size
-                             / (4 * np.pi * self._overdensity
-                                * self._rho_c))**(1/3)
+            self._r_Delta = (3*self._size / (4*np.pi)
+                             / (self._overdensity*self._rho_c))**(1/3)
         else:
             self._r_Delta = self._size
         return self._r_Delta
@@ -221,7 +220,7 @@ class NFW(object):
         from the center of the halo. Returns mass in M_sun."""
         r = unit_checker(r, u.megaparsec)
         x = r / self.r_s
-        return 4*np.pi * self.delta_c * self.rho_c * self.r_s**3 \
+        return 4 * np.pi * self.delta_c * self.rho_c * self.r_s**3 \
             * (np.log((1 + x)) - x/(1 + x))
 
     def sigma(self, r):
