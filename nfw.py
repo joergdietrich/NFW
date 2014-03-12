@@ -179,8 +179,8 @@ class NFW(object):
                    % (self.c, self.z,)
         for delta in (200, 500, 2500):
             prop_str += "M_%d = %.2e M_sun\tr_%d = %.2g Mpc\n" % \
-                        (delta, self.mass_Delta(delta), delta,
-                         self.radius_Delta(delta))
+                        (delta, self.mass_Delta(delta).value, delta,
+                         self.radius_Delta(delta).value)
         return prop_str
 
     def _mean_density_zero(self, r, Delta):
