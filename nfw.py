@@ -145,8 +145,8 @@ class NFW(object):
         if self._size_type == "mass":
             if self._update_required(self._rho_c):
                 self._rho_c = self.rho_c
-            self._r_Delta = (3*self._size / (4*np.pi)
-                             / (self._overdensity*self._rho_c))**(1/3)
+            self._r_Delta = (3 * self._size / (4*np.pi)
+                             * 1 / (self._overdensity*self._rho_c))**(1/3)
         else:
             self._r_Delta = self._size
         return self._r_Delta
