@@ -33,10 +33,6 @@ def unit_checker(x, unit):
     return x.to(unit)
 
 
-class InvalidNFWValue(Exception):
-    pass
-
-
 class NFW(object):
     """Compute properties of an NFW halo.
 
@@ -81,7 +77,7 @@ class NFW(object):
         self._rho_c = self.rho_c
 
         if size_type not in ['mass', 'radius']:
-            raise InvalidNFWValue(size_type)
+            raise ValueError("size_type must be one of 'mass', 'radius'")
         if size_type == "mass":
             self._size = unit_checker(size, u.solMass)
         else:

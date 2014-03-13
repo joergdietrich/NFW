@@ -15,6 +15,9 @@ class TestNFW(TestCase):
         cls._cosmo = astropy.cosmology.FlatLambdaCDM(70, 0.3, Tcmb0=0)
         astropy.cosmology.set_current(cls._cosmo)
 
+    def test_faulty_init(self):
+        assert_raises(ValueError, NFW, 1e15, 5, 0, "foo")
+
     def test_mass_init(self):
         m200 = 1e15 * u.solMass
         c = 5.
