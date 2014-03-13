@@ -115,7 +115,7 @@ class NFW(object):
 
     @property
     def delta_c(self):
-        """Characterstic overdensity
+        """Characteristic overdensity
         """
         return 200/3 * self.c**3 / (np.log(1 + self.c) - self.c/(1. + self.c))
 
