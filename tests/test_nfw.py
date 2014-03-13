@@ -1,6 +1,6 @@
 import numpy as np
 from numpy.testing import (TestCase, assert_array_equal, assert_equal,
-                           assert_almost_equal, assert_array_almost_equal, 
+                           assert_almost_equal, assert_array_almost_equal,
                            assert_raises)
 from numpy.testing.decorators import knownfailureif
 
@@ -8,6 +8,7 @@ import astropy.cosmology
 from astropy import units as u
 
 from nfw import NFW
+
 
 class TestNFW(TestCase):
     @classmethod
@@ -70,7 +71,7 @@ class TestNFW(TestCase):
         nfw = NFW(m200, c, z)
         m = nfw.mass(1.32)
         assert_almost_equal(m.value/1e14, 7.656709240756399)
-        
+
     def test_sigma(self):
         m200 = 1e15
         c = 5.
@@ -86,7 +87,7 @@ class TestNFW(TestCase):
         nfw = NFW(m200, c, z)
         ds = nfw.delta_sigma(1.12)
         assert_almost_equal(ds.value/1e14, 1.3877272300533743)
-        
+
     def test_mass_consistency(self):
         m200 = 1e15
         c = 5.
