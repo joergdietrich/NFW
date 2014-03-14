@@ -149,3 +149,32 @@ class TestNFW(TestCase):
             astropy.cosmology.set_current(save_cosmo)
             raise
         astropy.cosmology.set_current(save_cosmo)
+
+    def test_var_cosmo_attr(self):
+        m200 = 5e14
+        c = 3.5
+        z = 0.15
+        nfw1 = NFW(m200, c, z)
+        assert(nfw1.var_cosmology)
+        nfw2 = NFW(m200, c, z, cosmology=astropy.cosmology.get_current())
+        assert(not nfw2.var_cosmology)
+
+    def test_var_cosmo_obj(self):
+        wmap9 = astropy.cosmology.WMAP9
+        save_cosmo = astropy.cosmology.get_current()
+        m200 = 5e14
+        c = 3.5
+        z = 0.15
+        nfw = NFW(m200, c, z)
+        assert(nfw.cosmology is save_cosmo)
+        r325 = nfw.radius_Delta(325).value
+        astropy.cosmology.set_current(wmap9)
+        try:
+            assert(nfw.cosmology is wmap9)
+        except:
+            astropy.cosmology.set_current(save_cosmo)
+            raise
+        # Ensure that accessing the cosmology property also updates
+        # the other properties.
+        assert_almost_equal(nfw.radius_Delta(325).value, r325)
+        astropy.cosmology.set_current(save_cosmo)

@@ -104,6 +104,24 @@ class NFW(object):
         return True
 
     @property
+    def var_cosmology(self):
+        """True if the cosmology always is the current astropy.cosmology
+        one. False if the cosmology is held fixed at the one used at
+        instantiation."""
+        return self._var_cosmology
+
+    @property
+    def cosmology(self):
+        """The cosmology used by this halo."""
+        if self._var_cosmology:
+            # If the cosmology is variable, ensure that we trigger the
+            # whole update chain of rho_c, r_Delta, r_s before setting
+            # the _cosmology attribute.
+            if self._update_required(self._rho_c):
+                self._rho_c = self.rho_c
+        return self._cosmology
+
+    @property
     def c(self):
         """Halo concentration"""
         return self._c
