@@ -17,7 +17,10 @@ class TestNFW(TestCase):
         astropy.cosmology.set_current(cls._cosmo)
 
     def test_faulty_init(self):
-        assert_raises(ValueError, NFW, 1e15, 5, 0, "foo")
+        assert_raises(ValueError, NFW, 1e15, 5, 0, 'size_type="foo"')
+        assert_raises(ValueError, NFW, 1e15, 5, 0,
+                      'size_type="mass"',
+                      'overdensity_type="bar"')
 
     def test_mass_init(self):
         m200 = 1e15 * u.solMass
@@ -27,6 +30,13 @@ class TestNFW(TestCase):
         assert_equal(nfw.c, c)
         assert_equal(nfw.z, z)
         assert_almost_equal(nfw.r_s.value, 0.3724844259709579)
+
+    def test_mass_init_bckg(self):
+        m200 = 1e15
+        c = 5
+        z = 0.2
+        nfw = NFW(m200, c, z, overdensity_type='mean')
+        assert_almost_equal(nfw.radius_Delta(200).value, 3.708806727880765)
 
     def test_radius_Delta(self):
         m200 = 1e15
@@ -167,7 +177,6 @@ class TestNFW(TestCase):
         z = 0.15
         nfw = NFW(m200, c, z)
         assert(nfw.cosmology is save_cosmo)
-        r325 = nfw.radius_Delta(325).value
         astropy.cosmology.set_current(wmap9)
         try:
             assert(nfw.cosmology is wmap9)
@@ -176,5 +185,5 @@ class TestNFW(TestCase):
             raise
         # Ensure that accessing the cosmology property also updates
         # the other properties.
-        assert_almost_equal(nfw.radius_Delta(325).value, r325)
+        assert_almost_equal(nfw.radius_Delta(325).value, 1.2525923457595705)
         astropy.cosmology.set_current(save_cosmo)
