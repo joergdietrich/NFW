@@ -84,12 +84,7 @@ class NFW(object):
         self._rho_c = None
         self._r_s = None
         self._r_Delta = None
-        if self._var_cosmology:
-            self._update_new_cosmology()
-        else:
-            self._update_rho_c()
-            self._update_r_Delta()
-            self._update_r_s()
+        self._update_new_cosmology()
             
         return
 
@@ -104,7 +99,8 @@ class NFW(object):
         return True
 
     def _update_new_cosmology(self):
-        self._cosmology = astropy.cosmology.get_current()
+        if self._var_cosmology:
+            self._cosmology = astropy.cosmology.get_current()
         self._update_rho_c()
         self._update_r_Delta()
         self._update_r_s()
