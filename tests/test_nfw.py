@@ -38,6 +38,14 @@ class TestNFW(TestCase):
         nfw = NFW(m200, c, z, overdensity_type='mean')
         assert_almost_equal(nfw.radius_Delta(200).value, 3.708806727880765)
 
+    def test_mean_crit_consistency(self):
+        m200b = 1e15
+        c = 5
+        z = 0.3
+        nfw = NFW(m200b, c, z, overdensity_type='mean')
+        m200c = nfw.mass_Delta(200, overdensity_type='critical').value
+        assert_almost_equal(m200c, 2062054316492159.8)
+
     def test_radius_Delta(self):
         m200 = 1e15
         c = 5.
