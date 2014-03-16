@@ -85,7 +85,7 @@ class NFW(object):
         self._r_s = None
         self._r_Delta = None
         self._update_new_cosmology()
-            
+
         return
 
     def _update_required(self):
@@ -126,7 +126,7 @@ class NFW(object):
 
     def _update_r_s(self):
         self._r_s = self._rDelta2rs(self._r_Delta, self._overdensity)
-        return 
+        return
 
     @property
     def var_cosmology(self):
