@@ -54,12 +54,17 @@ class NFW(object):
     """
 
     def __init__(self, size, c, z, size_type="mass",
-                 overdensity=200.,
-                 overdensity_type="critical", cosmology=None):
-        if overdensity_type != "critical":
-            print "You must be kidding."
-            print "Of course overdensities are defined wrt the " \
-                "critical density."
+                 overdensity=200, overdensity_type="critical",
+                 cosmology=None):
+
+        if overdensity_type not in ['critical', 'mean']:
+            raise ValueError("overdensity_type must be one of 'mean', "
+                             "'background'")
+        self._overdensity_type = overdensity_type
+
+        if size_type not in ['mass', 'radius']:
+            raise ValueError("size_type must be one of 'mass', 'radius'")
+        self._size_type = size_type
 
         self._c = float(c)
         self._z = float(z)
@@ -71,37 +76,57 @@ class NFW(object):
             self._cosmology = astropy.cosmology.get_current()
             self._var_cosmology = True
 
-        self._rho_c = None
-        self._r_s = None
-        self._r_Delta = None
-        self._rho_c = self.rho_c
-
-        if size_type not in ['mass', 'radius']:
-            raise ValueError("size_type must be one of 'mass', 'radius'")
         if size_type == "mass":
             self._size = unit_checker(size, u.solMass)
         else:
             self._size = unit_checker(size, u.megaparsec)
-        self._size_type = size_type
 
-        self._r_Delta = self.r_Delta
-        self._r_s = self.r_s
+        self._rho_c = None
+        self._r_s = None
+        self._r_Delta = None
+        self._update_new_cosmology()
 
         return
 
-    def _update_required(self, attr):
+    def _update_required(self):
         """
-        Check whether an attr needs updating due to a new cosmology
-        Arguments:
-        - `attr`: an instance attribute
+        Check whether the instance needs updating due to a new cosmology
         """
-        if attr is None:
-            return True
         if not self._var_cosmology:
             return False
         if self._cosmology == astropy.cosmology.get_current():
             return False
         return True
+
+    def _update_new_cosmology(self):
+        if self._var_cosmology:
+            self._cosmology = astropy.cosmology.get_current()
+        self._update_rho_c()
+        self._update_r_Delta()
+        self._update_r_s()
+        return
+
+    def _update_rho_c(self):
+        self._rho_c = self._cosmology.critical_density(self.z)
+        self._rho_c = self._rho_c.to(u.solMass / u.megaparsec**3)
+        return
+
+    def _update_r_Delta(self):
+        if self._size_type == "mass":
+            if self._overdensity_type == 'critical':
+                rho = self._rho_c
+            else:
+                rho = self._rho_c * self._cosmology.Om(self.z)
+
+            self._r_Delta = (3 * self._size / (4*np.pi)
+                             * 1 / (self._overdensity*rho))**(1/3)
+        else:
+            self._r_Delta = self._size
+        return
+
+    def _update_r_s(self):
+        self._r_s = self._rDelta2rs(self._r_Delta, self._overdensity)
+        return
 
     @property
     def var_cosmology(self):
@@ -111,15 +136,39 @@ class NFW(object):
         return self._var_cosmology
 
     @property
+    def overdensity_type(self):
+        return self._overdensity_type
+
+    @property
     def cosmology(self):
         """The cosmology used by this halo."""
-        if self._var_cosmology:
-            # If the cosmology is variable, ensure that we trigger the
-            # whole update chain of rho_c, r_Delta, r_s before setting
-            # the _cosmology attribute.
-            if self._update_required(self._rho_c):
-                self._rho_c = self.rho_c
+        if self._update_required():
+            self._update_new_cosmology()
         return self._cosmology
+
+    @property
+    def rho_c(self):
+        """Critical density at halo redshift
+        """
+        if self._update_required():
+            self._update_new_cosmology()
+        return self._rho_c
+
+    @property
+    def r_Delta(self):
+        """Halo radius at initialization overdensity
+        """
+        if self._update_required():
+            self._update_new_cosmology()
+        return self._r_Delta
+
+    @property
+    def r_s(self):
+        """Scale radius
+        """
+        if self._update_required():
+            self._update_new_cosmology()
+        return self._r_s
 
     @property
     def c(self):
@@ -136,45 +185,6 @@ class NFW(object):
         """Characteristic overdensity
         """
         return 200/3 * self.c**3 / (np.log(1 + self.c) - self.c/(1. + self.c))
-
-    @property
-    def rho_c(self):
-        """Critical density at halo redshift
-        """
-        if self._update_required(self._rho_c):
-            if self._var_cosmology:
-                self._cosmology = astropy.cosmology.get_current()
-            self._rho_c = self._cosmology.critical_density(self.z)
-            self._rho_c = self._rho_c.to(u.solMass / u.megaparsec**3)
-            if self._r_Delta is not None:
-                self._r_Delta = self.r_Delta
-            if self._r_s is not None:
-                self._r_s = self.r_s
-        return self._rho_c
-
-    @property
-    def r_Delta(self):
-        """Halo radius at initialization overdensity
-        """
-        if self._size_type == "mass":
-            if self._update_required(self._rho_c):
-                self._rho_c = self.rho_c
-            self._r_Delta = (3 * self._size / (4*np.pi)
-                             * 1 / (self._overdensity*self._rho_c))**(1/3)
-        else:
-            self._r_Delta = self._size
-        return self._r_Delta
-
-    @property
-    def r_s(self):
-        """Scale radius
-        """
-        if self._update_required(self._r_s):
-            self._r_Delta = self.r_Delta
-            self._r_s = self._rDelta2rs(self._r_Delta, self._overdensity)
-            if self._var_cosmology:
-                self._cosmology = astropy.cosmology.get_current()
-        return self._r_s
 
     def _rDelta2r200_zero(self, rs, r_Delta, overdensity):
         rs *= u.megaparsec
@@ -199,19 +209,30 @@ class NFW(object):
     def __repr__(self):
         return self.__str__()
 
-    def _mean_density_zero(self, r, Delta):
-        return (self.mean_density(r) - Delta*self.rho_c).value
+    def _mean_density_zero(self, r, Delta, overdensity_type=None):
+        if overdensity_type is None:
+            overdensity_type = self._overdensity_type
+        if overdensity_type == 'critical':
+            rho = self.rho_c
+        else:
+            rho = self.rho_c * self.cosmology.Om(self.z)
+        return (self.mean_density(r) - Delta*rho).value
 
-    def radius_Delta(self, Delta):
+    def radius_Delta(self, Delta, overdensity_type=None):
         """Find the radius at which the mean density is Delta times the
         critical density. Returns radius in Mpc."""
-        x0 = opt.brentq(self._mean_density_zero, 1e-6, 10, args=(Delta,))
+        if overdensity_type is None:
+            overdensity_type = self._overdensity_type
+        x0 = opt.brentq(self._mean_density_zero, 1e-6, 10,
+                        args=(Delta, overdensity_type))
         return x0 * u.megaparsec
 
-    def mass_Delta(self, Delta):
+    def mass_Delta(self, Delta, overdensity_type=None):
         """Find the mass inside a radius inside which the mean density
         is Delta times the critical density. Returns mass in M_sun."""
-        r = self.radius_Delta(Delta)
+        if overdensity_type is None:
+            overdensity_type = self._overdensity_type
+        r = self.radius_Delta(Delta, overdensity_type)
         return self.mass(r)
 
     def density(self, r):
