@@ -264,7 +264,7 @@ class NFW(object):
         r = unit_checker(r, u.megaparsec)
         x = r / self.r_s
         val1 = 1 / (x**2 - 1)
-        val2 = float((arcsec(x) / (sm.sqrt(x**2 - 1))**3).real)
+        val2 = (arcsec(x) / (sm.sqrt(x**2 - 1))**3).real
         return 2 * self.r_s * self.rho_c * self.delta_c * (val1-val2)
 
     def delta_sigma(self, r):
@@ -276,6 +276,6 @@ class NFW(object):
         val1 = 1 / (1 - x**2)
         num = ((3 * x**2) - 2) * arcsec(x)
         div = x**2 * (sm.sqrt(x**2 - 1))**3
-        val2 = float((num / div).real)
+        val2 = (num / div).real
         val3 = 2 * np.log(x / 2) / x**2
         return fac * (val1+val2+val3)

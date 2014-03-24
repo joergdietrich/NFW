@@ -103,8 +103,9 @@ class TestNFW(TestCase):
         c = 5.
         z = 0.3
         nfw = NFW(m200, c, z)
-        ds = nfw.delta_sigma(1.12)
-        assert_almost_equal(ds.value/1e14, 1.3877272300533743)
+        ds = nfw.delta_sigma([0.1, 1.12])
+        ref_arr = np.array([5.28752650, 1.38772723])
+        assert_array_almost_equal(ds.value/1e14, ref_arr)
 
     def test_mass_consistency(self):
         m200 = 1e15
