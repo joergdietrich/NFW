@@ -79,7 +79,7 @@ class NFW(object):
         if size_type == "mass":
             self._size = unit_checker(size, u.solMass)
         else:
-            self._size = unit_checker(size, u.megaparsec)
+            self._size = unit_checker(size, u.Mpc)
 
         self._rho_c = None
         self._r_s = None
@@ -108,7 +108,7 @@ class NFW(object):
 
     def _update_rho_c(self):
         self._rho_c = self._cosmology.critical_density(self.z)
-        self._rho_c = self._rho_c.to(u.solMass / u.megaparsec**3)
+        self._rho_c = self._rho_c.to(u.solMass / u.Mpc**3)
         return
 
     def _update_r_Delta(self):
@@ -187,7 +187,7 @@ class NFW(object):
         return 200/3 * self.c**3 / (np.log(1 + self.c) - self.c/(1. + self.c))
 
     def _rDelta2r200_zero(self, rs, r_Delta, overdensity):
-        rs *= u.megaparsec
+        rs *= u.Mpc
         z = (overdensity/3 * r_Delta**3) - (self.delta_c * rs**3) \
             * (math.log((rs+r_Delta) / rs) - (r_Delta / (rs+r_Delta)))
         return z.value
@@ -195,7 +195,7 @@ class NFW(object):
     def _rDelta2rs(self, r_Delta, overdensity):
         r200 = opt.brentq(self._rDelta2r200_zero, 1e-6, 100,
                           args=(r_Delta, overdensity))
-        return r200 * u.megaparsec
+        return r200 * u.Mpc
 
     def __str__(self):
         prop_str = "NFW halo with concentration %.2g at redshift %.2f:\n\n" \
@@ -225,7 +225,7 @@ class NFW(object):
             overdensity_type = self._overdensity_type
         x0 = opt.brentq(self._mean_density_zero, 1e-6, 10,
                         args=(Delta, overdensity_type))
-        return x0 * u.megaparsec
+        return x0 * u.Mpc
 
     def mass_Delta(self, Delta, overdensity_type=None):
         """Find the mass inside a radius inside which the mean density
@@ -238,14 +238,15 @@ class NFW(object):
     def density(self, r):
         """Compute the density rho of an NFW halo at radius r (in Mpc)
         from the center of the halo. Returns M_sun/Mpc^3."""
-        r = unit_checker(r, u.megaparsec)
+        r = unit_checker(r, u.Mpc)
         x = r / self.r_s
         return self.rho_c * self.delta_c/(x * (1+x)**2)
 
     def mean_density(self, r):
-        """Compute the mean density inside a radius r (in
-        Mpc). Returns M_sun/Mpc^3."""
-        r = unit_checker(r, u.megaparsec)
+        """Compute the mean density inside a radius r (in Mpc). Returns
+        M_sun/Mpc^3.
+        """
+        r = unit_checker(r, u.Mpc)
         x = r / self.r_s
         return 3 * (1/x)**3 * self.delta_c * self.rho_c \
             * (np.log((1 + x)) - x/(1 + x))
@@ -253,7 +254,7 @@ class NFW(object):
     def mass(self, r):
         """Compute the mass of an NFW halo inside radius r (in Mpc)
         from the center of the halo. Returns mass in M_sun."""
-        r = unit_checker(r, u.megaparsec)
+        r = unit_checker(r, u.Mpc)
         x = r / self.r_s
         return 4 * np.pi * self.delta_c * self.rho_c * self.r_s**3 \
             * (np.log((1 + x)) - x/(1 + x))
@@ -261,7 +262,7 @@ class NFW(object):
     def sigma(self, r):
         """Compute the surface mass density of the halo at distance r
         (in Mpc) from the halo center."""
-        r = unit_checker(r, u.megaparsec)
+        r = unit_checker(r, u.Mpc)
         x = r / self.r_s
         val1 = 1 / (x**2 - 1)
         val2 = (arcsec(x) / (sm.sqrt(x**2 - 1))**3).real
@@ -270,7 +271,7 @@ class NFW(object):
     def delta_sigma(self, r):
         """Compute the Delta surface mass density of the halo at
         radius r (in Mpc) from the halo center."""
-        r = unit_checker(r, u.megaparsec)
+        r = unit_checker(r, u.Mpc)
         x = r / self.r_s
         fac = 2 * self.r_s * self.rho_c * self.delta_c
         val1 = 1 / (1 - x**2)

@@ -138,7 +138,7 @@ class TestNFW(TestCase):
         c = 4
         z = 0.2
         nfw1 = NFW(r200, c, z, size_type='radius')
-        nfw2 = NFW(r200 * u.megaparsec, c, z, size_type='radius')
+        nfw2 = NFW(r200 * u.Mpc, c, z, size_type='radius')
         nfw3 = NFW(r200*1000 * u.kiloparsec, c, z, size_type='radius')
         assert_almost_equal(nfw1.mass_Delta(200), nfw2.mass_Delta(200))
         assert_almost_equal(nfw1.mass_Delta(200), nfw3.mass_Delta(200))
