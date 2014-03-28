@@ -191,17 +191,6 @@ class NFW(object):
         return self._overdensity/3 * self.c**3 / (np.log(1 + self.c) \
                                                   - self.c/(1. + self.c))
 
-    def _rDelta2r200_zero(self, rs, r_Delta, overdensity):
-        rs *= u.Mpc
-        z = (overdensity/3 * r_Delta**3) - (self.delta_c * rs**3) \
-            * (math.log((rs+r_Delta) / rs) - (r_Delta / (rs+r_Delta)))
-        return z.value
-
-    def _rDelta2rs(self, r_Delta, overdensity):
-        rs = opt.brentq(self._rDelta2r200_zero, 1e-6, 100,
-                          args=(r_Delta, overdensity))
-        return rs * u.Mpc
-
     def __str__(self):
         prop_str = "NFW halo with concentration %.2g at redshift %.2f:\n\n" \
                    % (self.c, self.z,)
