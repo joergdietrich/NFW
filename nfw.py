@@ -191,6 +191,17 @@ class NFW(object):
         return self._overdensity/3 * self.c**3 / (np.log(1 + self.c) \
                                                   - self.c/(1. + self.c))
 
+    def concentration(self, overdensity=None, overdensity_type=None):
+        """Return the concencration parameter at overdensity and
+        overdensity_type. If both are None, return the concentration at the
+        overdensity and type specified at instantiation."""
+        print overdensity
+        if overdensity is None and overdensity_type is None:
+            return self.c
+        overdensity = overdensity
+        overdensity_type = overdensity_type
+        return self.radius_Delta(overdensity, overdensity_type) / self.r_s
+
     def __str__(self):
         prop_str = "NFW halo with concentration %.2g at redshift %.2f:\n\n" \
                    % (self.c, self.z,)

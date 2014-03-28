@@ -107,6 +107,14 @@ class TestNFW(TestCase):
         ref_arr = np.array([5.28752650, 1.38772723])
         assert_array_almost_equal(ds.value/1e14, ref_arr)
 
+    def test_concentration(self):
+        m200 = 1e15
+        c = 5.
+        z = 0.3
+        nfw = NFW(m200, c, z)
+        c500 = nfw.radius_Delta(500) / nfw.r_s
+        assert_almost_equal(c500, [3.3051557218506047])
+
     def test_mass_consistency(self):
         m200 = 1e15
         c = 5.
