@@ -125,7 +125,7 @@ class NFW(object):
         return
 
     def _update_r_s(self):
-        self._r_s = self._rDelta2rs(self._r_Delta, self._overdensity)
+        self._r_s = self.r_Delta / self.c 
         return
 
     @property
@@ -138,6 +138,10 @@ class NFW(object):
     @property
     def overdensity_type(self):
         return self._overdensity_type
+
+    @property
+    def overdensity(self):
+        return self._overdensity
 
     @property
     def cosmology(self):
@@ -184,7 +188,8 @@ class NFW(object):
     def delta_c(self):
         """Characteristic overdensity
         """
-        return 200/3 * self.c**3 / (np.log(1 + self.c) - self.c/(1. + self.c))
+        return self._overdensity/3 * self.c**3 / (np.log(1 + self.c) \
+                                                  - self.c/(1. + self.c))
 
     def _rDelta2r200_zero(self, rs, r_Delta, overdensity):
         rs *= u.Mpc
@@ -193,9 +198,9 @@ class NFW(object):
         return z.value
 
     def _rDelta2rs(self, r_Delta, overdensity):
-        r200 = opt.brentq(self._rDelta2r200_zero, 1e-6, 100,
+        rs = opt.brentq(self._rDelta2r200_zero, 1e-6, 100,
                           args=(r_Delta, overdensity))
-        return r200 * u.Mpc
+        return rs * u.Mpc
 
     def __str__(self):
         prop_str = "NFW halo with concentration %.2g at redshift %.2f:\n\n" \
