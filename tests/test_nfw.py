@@ -66,6 +66,23 @@ class TestNFW(TestCase):
         m500 = nfw.mass_Delta(500)
         assert_almost_equal(m500.value/1e14, 7.221140, 6)
 
+    def test_projected_mass(self):
+        m200 = 1e15
+        c = 3
+        z = 0.3
+        nfw = NFW(m200, c, z)
+        r = np.linspace(0.2, 3, 20) * u.Mpc
+        m_proj = nfw.projected_mass(r) / 1e14
+        # Comparison array was computed by numerical integration
+        m_comp = np.array([1.16749071e+14, 2.43823901e+14, 3.73873287e+14,
+                           5.00159715e+14, 6.20505986e+14, 7.34386597e+14,
+                           8.41921446e+14, 9.43479009e+14, 1.03950855e+15,
+                           1.13046724e+15, 1.21678913e+15, 1.29887325e+15,
+                           1.37708069e+15, 1.45173558e+15, 1.52312796e+15,
+                           1.59151704e+15, 1.65713471e+15, 1.72018864e+15,
+                           1.78086525e+15, 1.83933223e+15]) / 1e14
+        assert_array_almost_equal(m_proj.value, m_comp)
+
     def test_density(self):
         m200 = 1e15
         c = 5.
