@@ -125,7 +125,7 @@ class NFW(object):
         return
 
     def _update_r_s(self):
-        self._r_s = self.r_Delta / self.c 
+        self._r_s = self.r_Delta / self.c
         return
 
     @property
@@ -188,7 +188,7 @@ class NFW(object):
     def delta_c(self):
         """Characteristic overdensity
         """
-        return self._overdensity/3 * self.c**3 / (np.log(1 + self.c) \
+        return self._overdensity/3 * self.c**3 / (np.log(1 + self.c)
                                                   - self.c/(1. + self.c))
 
     def concentration(self, overdensity=None, overdensity_type=None):
@@ -263,6 +263,25 @@ class NFW(object):
         x = r / self.r_s
         return 4 * np.pi * self.delta_c * self.rho_c * self.r_s**3 \
             * (np.log((1 + x)) - x/(1 + x))
+
+    def projected_mass(self, r):
+        """Compute the projected mass of the NFW profile inside a cylinder of
+        radius r.
+
+        Parameters:
+        ===========
+        r: float or astropy.Quantity, radius of the cylinder
+
+        Returns:
+        ========
+        m_proj: astropy.Quantity, projected mass in the cylinder
+        """
+        r = unit_checker(r, u.Mpc)
+        x = (r / self.r_s).value
+        fc = np.log(1 + self.c) - self.c / (1 + self.c)
+        f = (arcsec(x) / sm.sqrt(x**2 - 1)).real
+        m_proj = self.mass_Delta(self._overdensity) / fc * (np.log(x / 2) + f)
+        return m_proj
 
     def sigma(self, r):
         """Compute the surface mass density of the halo at distance r
