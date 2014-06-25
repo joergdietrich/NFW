@@ -2,11 +2,8 @@
 
 from __future__ import division
 
-import math
-
 import numpy as np
 from numpy.lib import scimath as sm
-import scipy.constants
 import scipy.optimize as opt
 
 import astropy.cosmology
