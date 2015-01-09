@@ -18,18 +18,6 @@ def arcsec(z):
     return 0.5 * np.pi + val
 
 
-def unit_checker(x, unit):
-    """Check that x has units u. Convert to appropriate units if not.
-
-    Arguments:
-    - `x`: array_like
-    - `u`: astro.units unit
-    """
-    if not isinstance(x, u.Quantity):
-        return x * unit
-    return x.to(unit)
-
-
 class NFW(object):
     """Compute properties of an NFW halo.
 
@@ -74,9 +62,9 @@ class NFW(object):
             self._var_cosmology = True
 
         if size_type == "mass":
-            self._size = unit_checker(size, u.solMass)
+            self._size = u.Quantity(size, u.solMass)
         else:
-            self._size = unit_checker(size, u.Mpc)
+            self._size = u.Quantity(size, u.Mpc)
 
         self._rho_c = None
         self._r_s = None
@@ -240,7 +228,7 @@ class NFW(object):
     def density(self, r):
         """Compute the density rho of an NFW halo at radius r (in Mpc)
         from the center of the halo. Returns M_sun/Mpc^3."""
-        r = unit_checker(r, u.Mpc)
+        r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
         return self.rho_c * self.delta_c/(x * (1+x)**2)
 
@@ -248,7 +236,7 @@ class NFW(object):
         """Compute the mean density inside a radius r (in Mpc). Returns
         M_sun/Mpc^3.
         """
-        r = unit_checker(r, u.Mpc)
+        r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
         return 3 * (1/x)**3 * self.delta_c * self.rho_c \
             * (np.log((1 + x)) - x/(1 + x))
@@ -256,7 +244,7 @@ class NFW(object):
     def mass(self, r):
         """Compute the mass of an NFW halo inside radius r (in Mpc)
         from the center of the halo. Returns mass in M_sun."""
-        r = unit_checker(r, u.Mpc)
+        r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
         return 4 * np.pi * self.delta_c * self.rho_c * self.r_s**3 \
             * (np.log((1 + x)) - x/(1 + x))
@@ -273,7 +261,7 @@ class NFW(object):
         ========
         m_proj: astropy.Quantity, projected mass in the cylinder
         """
-        r = unit_checker(r, u.Mpc)
+        r = u.Quantity(r, u.Mpc)
         x = (r / self.r_s).value
         fc = np.log(1 + self.c) - self.c / (1 + self.c)
         f = (arcsec(x) / sm.sqrt(x**2 - 1)).real
@@ -283,7 +271,7 @@ class NFW(object):
     def sigma(self, r):
         """Compute the surface mass density of the halo at distance r
         (in Mpc) from the halo center."""
-        r = unit_checker(r, u.Mpc)
+        r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
         val1 = 1 / (x**2 - 1)
         val2 = (arcsec(x) / (sm.sqrt(x**2 - 1))**3).real
@@ -292,7 +280,7 @@ class NFW(object):
     def delta_sigma(self, r):
         """Compute the Delta surface mass density of the halo at
         radius r (in Mpc) from the halo center."""
-        r = unit_checker(r, u.Mpc)
+        r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
         fac = 2 * self.r_s * self.rho_c * self.delta_c
         val1 = 1 / (1 - x**2)
