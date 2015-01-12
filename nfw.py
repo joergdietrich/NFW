@@ -183,9 +183,15 @@ class NFW(object):
 
     @property
     def var_cosmology(self):
-        """True if the cosmology always is the current astropy.cosmology
-        one. False if the cosmology is held fixed at the one used at
-        instantiation."""
+        """Does the cosmology change with the current cosmology?
+
+        Returns:
+        --------
+        var_cosmology : bool
+            True if the computations are computed for the current
+            astropy cosmology, False if the cosmology specified at
+            instantiation is used.
+        """
         return self._var_cosmology
 
     @property
