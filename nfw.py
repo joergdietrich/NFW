@@ -21,21 +21,89 @@ def arcsec(z):
 class NFW(object):
     """Compute properties of an NFW halo.
 
-    Required inputs are
+    This class implements the Navarro-Frenk-White [1]_ halo density
+    profile in dependence on halo properties such as mass and
+    concentration, and cosmology.
 
-    size - radius or mass of the halo in Mpc or M_sun
-    c - concentration (value|"duffy|dolag")
-    z - halo redshift
+    Parameters:
+    -----------
+    size : float or astropy.quantity.Quantity 
+        Either the halo radius or mass (default), which is assumed is
+        specified by `size_type` Float inputs are assumed to be either
+        in Mpc (radius) or solar masses (mass).
+    c : float
+        Halo concentration parameter.
+    z : float
+        Halo redshift.
+    size_type : {"radius", "mass"}, optional
+        Specifies whether `size` is the halo radius or mass.
+    overdensity : float, optional 
+        The overdensity factor above the critical or mean density of
+        the Universe at which mass or radius are computed (the default
+        is 200).
+    overdensity_type : {"critical", "mean"}, optional
+         Specifies whether overdensities are computed with respect to
+         the critical or mean density of the Universe (default is
+         "critical").
+    cosmology : astropy.cosmology, optional 
+         The cosmological background model of the NFW halo. Defaults
+         to `None`, in which case the current cosmology at the time a
+         method is called is used. See Notes below for details.
 
-    optional input
+    Attributes:
+    -----------
+    var_cosmology
+    overdensity_type : {"critical", "mean"}
+        The type of overdensity.
+    overdensity : float
+        The overdensity with respect to the mean/critical density.
+    cosmology : astropy.cosmology
+        The background cosmology for this halo.
+    rho_c : astropy.quantity.Quantity
+        The critical density at halo redshift `z`.
+    r_Delta : astropy.quantity.Quantity
+        The halo radius at the current `overdensity`.
+    r_s : astropy.quantity.Quantity
+        The halo scale radius.
+    c : float
+        NFW concentration parameter.
+    z : float
+        Halo redshift.
+    delta_c : float
+        Characteristic overdensity.
 
-    size_type - "(radius|mass)" specifies whether the halo size is given as
-                radius or mass
-    overdensity - the factor above the critical/mean density of the Universe
-                  at which mass/radius are computed. Default 200
-    overdensity_type = "(critical|mean)"
-    cosmology - object, use the current astropy.cosmology if None, otherwise
-                an astropy.cosmology object
+    Returns:
+    --------
+    object
+        An instance describing the NFW halo.
+
+    Notes:
+    ------
+    Quantities like the halo concentration, mass, critical density
+    etc. are defined with respect to a certain background cosmology
+    and for characteristic overdensities with respect to this
+    cosmology and halo redshift. Updating the class attributes that
+    define these dependencies will update all attributes that are
+    affected by this update. For example, if the overdensity factor is
+    changed from 200 to 500, the concentration parameter `c` will
+    change its value from c200 = rs / r200 to c = rs / r500. Note that
+    the scale radius does not depend on cosmolgy or overdensity
+    choice.
+
+    Note specifically, that if no cosmology is passed at
+    instantiation, the current cosmology will always be used. If the
+    current astropy cosmology changes after instantiation, the NFW
+    instance will follow this change. If you want to explicitly keep
+    the NFW instance fixed at the current cosmology *at instantiation*
+    you should pass `cosmology=astropy.cosmology.get_current()` to
+    __init__().
+    
+    References:
+    -----------
+    [1] Navarro, Julio F.  Frenk, Carlos S.  White, Simon D. M., "A
+    Universal Density Profile from Hierarchical Clustering", The
+    Astrophysical Journal vol. 490, pp. 493-508, 1997
+
     """
 
     def __init__(self, size, c, z, size_type="mass",
@@ -145,8 +213,6 @@ class NFW(object):
 
     @property
     def r_Delta(self):
-        """Halo radius at initialization overdensity
-        """
         if self._update_required():
             self._update_new_cosmology()
         return self._r_Delta
