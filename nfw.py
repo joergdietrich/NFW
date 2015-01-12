@@ -366,8 +366,17 @@ class NFW(object):
         return self.rho_c * self.delta_c/(x * (1+x)**2)
 
     def mean_density(self, r):
-        """Compute the mean density inside a radius r (in Mpc). Returns
-        M_sun/Mpc^3.
+        """Compute the mean density inside a radius.
+        Parameters:
+        -----------
+        r : float or astropy.quantity.Quantity
+            Distance from the halo center. If the argument is float,
+            Mpc are assumed.
+
+        Returns:
+        --------
+        rho_bar : astropy.quantity.Quantity
+            Mean density of the NFW halo inside the radius `r`.
         """
         r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
