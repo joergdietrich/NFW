@@ -372,16 +372,17 @@ class NFW(object):
             * (np.log((1 + x)) - x/(1 + x))
 
     def projected_mass(self, r):
-        """Compute the projected mass of the NFW profile inside a cylinder of
-        radius r.
+        """Compute the projected mass of the NFW profile inside a cylinder.
 
         Parameters:
-        ===========
-        r: float or astropy.Quantity, radius of the cylinder
+        -----------
+        r: float or astropy.quantity.Quantity
+            Radius of the cylinder. If the argument is float, Mpc are assumed.
 
         Returns:
-        ========
-        m_proj: astropy.Quantity, projected mass in the cylinder
+        --------
+        m_proj: astropy.quantity.Quantity
+            Projected mass in the cylinder of radius `r`.
         """
         r = u.Quantity(r, u.Mpc)
         x = (r / self.r_s).value
