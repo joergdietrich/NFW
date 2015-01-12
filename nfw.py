@@ -424,8 +424,19 @@ class NFW(object):
         return m_proj
 
     def sigma(self, r):
-        """Compute the surface mass density of the halo at distance r
-        (in Mpc) from the halo center."""
+        """Compute the surface mass density distance r.
+        Parameters:
+        -----------
+        r: float or astropy.quantity.Quantity
+            Projected distance from the halo cener. If the argument is
+            float, Mpc are assumed.
+
+        Returns:
+        --------
+        sigma : astropy.quantity.Quantity
+            Surface mass density of the halo at projected distance `r`.
+
+        """
         r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
         val1 = 1 / (x**2 - 1)
