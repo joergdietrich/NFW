@@ -348,8 +348,19 @@ class NFW(object):
         return self.mass(r)
 
     def density(self, r):
-        """Compute the density rho of an NFW halo at radius r (in Mpc)
-        from the center of the halo. Returns M_sun/Mpc^3."""
+        """Compute the density radius r from the center of the halo. 
+
+        Parameters:
+        -----------
+        r : float or astropy.quantity.Quantity
+            Distance from the halo center. If the argument is float,
+            Mpc are assumed.
+
+        Returns:
+        --------
+        rho : astropy.quantity.Quantity
+            Density of the NFW halo at a distance `r` from the halo center.
+        """
         r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
         return self.rho_c * self.delta_c/(x * (1+x)**2)
