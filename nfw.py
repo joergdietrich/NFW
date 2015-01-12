@@ -311,7 +311,7 @@ class NFW(object):
 
         Returns:
         --------
-        x0 : astropy.quantity.Quantity
+        radius : astropy.quantity.Quantity
             Radius inside which the average halo density is
             `overdensity` times the critical/mean density of the
             Universe.
@@ -322,12 +322,29 @@ class NFW(object):
                         args=(overdensity, overdensity_type))
         return x0 * u.Mpc
 
-    def mass_Delta(self, Delta, overdensity_type=None):
-        """Find the mass inside a radius inside which the mean density
-        is Delta times the critical density. Returns mass in M_sun."""
+    def mass_Delta(self, overdensity, overdensity_type=None):
+        """Compute the mass inside radius which contains a given overdensity.
+
+        Parameters:
+        -----------
+        overdensity : float
+            Overdensity factor with respect to the critical/mean density
+        overdensity_type : {"critical", "mean"}, optional
+            Specifies whether the overdensity factor is with respect
+            to the critical or mean density of the Universe. Default
+            is `None`, in which case the value of the attribute
+            `overdensity_type` is used.
+
+        Returns:
+        --------
+        mass : astropy.quantity.Quantity
+            Halo mass inside the radius which contains an overdensity
+            of factor `overdensity` with respect to the critical/mean
+            density.
+        """
         if overdensity_type is None:
             overdensity_type = self._overdensity_type
-        r = self.radius_Delta(Delta, overdensity_type)
+        r = self.radius_Delta(overdensity, overdensity_type)
         return self.mass(r)
 
     def density(self, r):
