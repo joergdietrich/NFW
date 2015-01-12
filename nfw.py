@@ -367,6 +367,7 @@ class NFW(object):
 
     def mean_density(self, r):
         """Compute the mean density inside a radius.
+
         Parameters:
         -----------
         r : float or astropy.quantity.Quantity
@@ -384,8 +385,19 @@ class NFW(object):
             * (np.log((1 + x)) - x/(1 + x))
 
     def mass(self, r):
-        """Compute the mass of an NFW halo inside radius r (in Mpc)
-        from the center of the halo. Returns mass in M_sun."""
+        """Compute the mass inside radius r.
+
+        Parameters:
+        -----------
+        r : float or astropy.quantity.Quantity
+            Distance from the halo center. If the argument is float,
+            Mpc are assumed.
+
+        Returns:
+        --------
+        mass : astropy.quantity.Quantity
+            Mass contained within the radius `r`.
+        """
         r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
         return 4 * np.pi * self.delta_c * self.rho_c * self.r_s**3 \
