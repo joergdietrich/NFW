@@ -408,7 +408,7 @@ class NFW(object):
 
         Parameters:
         -----------
-        r: float or astropy.quantity.Quantity
+        r : float or astropy.quantity.Quantity
             Radius of the cylinder. If the argument is float, Mpc are assumed.
 
         Returns:
@@ -425,9 +425,10 @@ class NFW(object):
 
     def sigma(self, r):
         """Compute the surface mass density distance r.
+
         Parameters:
         -----------
-        r: float or astropy.quantity.Quantity
+        r : float or astropy.quantity.Quantity
             Projected distance from the halo cener. If the argument is
             float, Mpc are assumed.
 
@@ -435,7 +436,6 @@ class NFW(object):
         --------
         sigma : astropy.quantity.Quantity
             Surface mass density of the halo at projected distance `r`.
-
         """
         r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
@@ -444,8 +444,20 @@ class NFW(object):
         return 2 * self.r_s * self.rho_c * self.delta_c * (val1-val2)
 
     def delta_sigma(self, r):
-        """Compute the Delta surface mass density of the halo at
-        radius r (in Mpc) from the halo center."""
+        """Compute the surface mass density minus its mean at radius r.
+
+        Parameters:
+        -----------
+        r : float or astropy.quantity.Quantity
+            Projected distance from the halo cener. If the argument is
+            float, Mpc are assumed.
+
+        Returns:
+        --------
+        delta_sigma : astropy.quantity.Quantity
+            Surface mass density at distance `r` minus the mean
+            surface mass density inside the same radius.
+        """
         r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
         fac = 2 * self.r_s * self.rho_c * self.delta_c
