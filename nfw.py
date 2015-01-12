@@ -27,7 +27,7 @@ class NFW(object):
 
     Parameters:
     -----------
-    size : float or astropy.quantity.Quantity 
+    size : float or astropy.quantity.Quantity
         Either the halo radius or mass (default), which is assumed is
         specified by `size_type` Float inputs are assumed to be either
         in Mpc (radius) or solar masses (mass).
@@ -37,7 +37,7 @@ class NFW(object):
         Halo redshift.
     size_type : {"radius", "mass"}, optional
         Specifies whether `size` is the halo radius or mass.
-    overdensity : float, optional 
+    overdensity : float, optional
         The overdensity factor above the critical or mean density of
         the Universe at which mass or radius are computed (the default
         is 200).
@@ -45,7 +45,7 @@ class NFW(object):
          Specifies whether overdensities are computed with respect to
          the critical or mean density of the Universe (default is
          "critical").
-    cosmology : astropy.cosmology, optional 
+    cosmology : astropy.cosmology, optional
          The cosmological background model of the NFW halo. Defaults
          to `None`, in which case the current cosmology at the time a
          method is called is used. See Notes below for details.
@@ -97,7 +97,7 @@ class NFW(object):
     the NFW instance fixed at the current cosmology *at instantiation*
     you should pass `cosmology=astropy.cosmology.get_current()` to
     __init__().
-    
+
     References:
     -----------
     [1] Navarro, Julio F.  Frenk, Carlos S.  White, Simon D. M., "A
