@@ -243,10 +243,32 @@ class NFW(object):
                                                   - self.c/(1. + self.c))
 
     def concentration(self, overdensity=None, overdensity_type=None):
-        """Return the concencration parameter at overdensity and
-        overdensity_type. If both are None, return the concentration at the
-        overdensity and type specified at instantiation."""
-        print overdensity
+        """Compute halo concentration at an overdensity.
+
+        Parameters:
+        -----------
+        overdensity : float, optional
+            The overdensity with respect to the mean/critical density
+            at which the halo concentration is computed. Defaults to
+            `None`, in which case the value of `overdensity` instance
+            attribute is used.
+        overdensity_type : {"critical", "mean"}, optional
+            Specifies whether the `overdensity` factor is with respect
+            to the critical or mean density of the Universe. Defaults
+            to `None`, in which case the value of the
+            `overdensity_type` instance attribute is used.
+
+        Returns:
+        --------
+        c : float
+            Halo concentration parameter.
+
+        Notes:
+        ------
+        If both `overdensity` and `overdensity_type` are `None`, the
+        return value is identical to the precomputed value of the
+        instance attribute `c`.
+        """
         if overdensity is None and overdensity_type is None:
             return self.c
         overdensity = overdensity
