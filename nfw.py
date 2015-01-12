@@ -296,13 +296,30 @@ class NFW(object):
             rho = self.rho_c * self.cosmology.Om(self.z)
         return (self.mean_density(r) - Delta*rho).value
 
-    def radius_Delta(self, Delta, overdensity_type=None):
-        """Find the radius at which the mean density is Delta times the
-        critical density. Returns radius in Mpc."""
+    def radius_Delta(self, overdensity, overdensity_type=None):
+        """Compute the radius which contains a given overdensity.
+
+        Paramters:
+        ----------
+        overdensity : float
+            Overdensity factor with respect to the critical/mean density
+        overdensity_type : {"critical", "mean"}, optional
+            Specifies whether the overdensity factor is with respect
+            to the critical or mean density of the Universe. Default
+            is `None`, in which case the value of the attribute
+            `overdensity_type` is used.
+
+        Returns:
+        --------
+        x0 : astropy.quantity.Quantity
+            Radius inside which the average halo density is
+            `overdensity` times the critical/mean density of the
+            Universe.
+        """
         if overdensity_type is None:
             overdensity_type = self._overdensity_type
         x0 = opt.brentq(self._mean_density_zero, 1e-6, 10,
-                        args=(Delta, overdensity_type))
+                        args=(overdensity, overdensity_type))
         return x0 * u.Mpc
 
     def mass_Delta(self, Delta, overdensity_type=None):
