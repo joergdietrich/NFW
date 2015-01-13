@@ -21,21 +21,89 @@ def arcsec(z):
 class NFW(object):
     """Compute properties of an NFW halo.
 
-    Required inputs are
+    This class implements the Navarro-Frenk-White [1]_ halo density
+    profile in dependence on halo properties such as mass and
+    concentration, and cosmology.
 
-    size - radius or mass of the halo in Mpc or M_sun
-    c - concentration (value|"duffy|dolag")
-    z - halo redshift
+    Parameters:
+    -----------
+    size : float or astropy.quantity.Quantity
+        Either the halo radius or mass (default), which is assumed is
+        specified by `size_type` Float inputs are assumed to be either
+        in Mpc (radius) or solar masses (mass).
+    c : float
+        Halo concentration parameter.
+    z : float
+        Halo redshift.
+    size_type : {"radius", "mass"}, optional
+        Specifies whether `size` is the halo radius or mass.
+    overdensity : float, optional
+        The overdensity factor above the critical or mean density of
+        the Universe at which mass or radius are computed (the default
+        is 200).
+    overdensity_type : {"critical", "mean"}, optional
+         Specifies whether overdensities are computed with respect to
+         the critical or mean density of the Universe (default is
+         "critical").
+    cosmology : astropy.cosmology, optional
+         The cosmological background model of the NFW halo. Defaults
+         to `None`, in which case the current cosmology at the time a
+         method is called is used. See Notes below for details.
 
-    optional input
+    Attributes:
+    -----------
+    var_cosmology
+    overdensity_type : {"critical", "mean"}
+        The type of overdensity.
+    overdensity : float
+        The overdensity with respect to the mean/critical density.
+    cosmology : astropy.cosmology
+        The background cosmology for this halo.
+    rho_c : astropy.quantity.Quantity
+        The critical density at halo redshift `z`.
+    r_Delta : astropy.quantity.Quantity
+        The halo radius at the current `overdensity`.
+    r_s : astropy.quantity.Quantity
+        The halo scale radius.
+    c : float
+        NFW concentration parameter.
+    z : float
+        Halo redshift.
+    delta_c : float
+        Characteristic overdensity.
 
-    size_type - "(radius|mass)" specifies whether the halo size is given as
-                radius or mass
-    overdensity - the factor above the critical/mean density of the Universe
-                  at which mass/radius are computed. Default 200
-    overdensity_type = "(critical|mean)"
-    cosmology - object, use the current astropy.cosmology if None, otherwise
-                an astropy.cosmology object
+    Returns:
+    --------
+    object
+        An instance describing the NFW halo.
+
+    Notes:
+    ------
+    Quantities like the halo concentration, mass, critical density
+    etc. are defined with respect to a certain background cosmology
+    and for characteristic overdensities with respect to this
+    cosmology and halo redshift. Updating the class attributes that
+    define these dependencies will update all attributes that are
+    affected by this update. For example, if the overdensity factor is
+    changed from 200 to 500, the concentration parameter `c` will
+    change its value from c200 = rs / r200 to c = rs / r500. Note that
+    the scale radius does not depend on cosmolgy or overdensity
+    choice.
+
+    Note specifically, that if no cosmology is passed at
+    instantiation, the current cosmology will always be used. If the
+    current astropy cosmology changes after instantiation, the NFW
+    instance will follow this change. If you want to explicitly keep
+    the NFW instance fixed at the current cosmology *at instantiation*
+    you should pass `cosmology=astropy.cosmology.get_current()` to
+    __init__().
+
+    References:
+    -----------
+    [1] Navarro, Julio F.  Frenk, Carlos S.  White, Simon D. M., "A
+    Universal Density Profile from Hierarchical Clustering", The
+    Astrophysical Journal vol. 490, pp. 493-508, 1997
+
     """
 
     def __init__(self, size, c, z, size_type="mass",
@@ -115,9 +183,15 @@ class NFW(object):
 
     @property
     def var_cosmology(self):
-        """True if the cosmology always is the current astropy.cosmology
-        one. False if the cosmology is held fixed at the one used at
-        instantiation."""
+        """Does the cosmology change with the current cosmology?
+
+        Returns:
+        --------
+        var_cosmology : bool
+            True if the computations are computed for the current
+            astropy cosmology, False if the cosmology specified at
+            instantiation is used.
+        """
         return self._var_cosmology
 
     @property
@@ -145,8 +219,6 @@ class NFW(object):
 
     @property
     def r_Delta(self):
-        """Halo radius at initialization overdensity
-        """
         if self._update_required():
             self._update_new_cosmology()
         return self._r_Delta
@@ -177,10 +249,32 @@ class NFW(object):
                                                   - self.c/(1. + self.c))
 
     def concentration(self, overdensity=None, overdensity_type=None):
-        """Return the concencration parameter at overdensity and
-        overdensity_type. If both are None, return the concentration at the
-        overdensity and type specified at instantiation."""
-        print overdensity
+        """Compute halo concentration at an overdensity.
+
+        Parameters:
+        -----------
+        overdensity : float, optional
+            The overdensity with respect to the mean/critical density
+            at which the halo concentration is computed. Defaults to
+            `None`, in which case the value of `overdensity` instance
+            attribute is used.
+        overdensity_type : {"critical", "mean"}, optional
+            Specifies whether the `overdensity` factor is with respect
+            to the critical or mean density of the Universe. Defaults
+            to `None`, in which case the value of the
+            `overdensity_type` instance attribute is used.
+
+        Returns:
+        --------
+        c : float
+            Halo concentration parameter.
+
+        Notes:
+        ------
+        If both `overdensity` and `overdensity_type` are `None`, the
+        return value is identical to the precomputed value of the
+        instance attribute `c`.
+        """
         if overdensity is None and overdensity_type is None:
             return self.c
         overdensity = overdensity
@@ -208,33 +302,88 @@ class NFW(object):
             rho = self.rho_c * self.cosmology.Om(self.z)
         return (self.mean_density(r) - Delta*rho).value
 
-    def radius_Delta(self, Delta, overdensity_type=None):
-        """Find the radius at which the mean density is Delta times the
-        critical density. Returns radius in Mpc."""
+    def radius_Delta(self, overdensity, overdensity_type=None):
+        """Compute the radius which contains a given overdensity.
+
+        Paramters:
+        ----------
+        overdensity : float
+            Overdensity factor with respect to the critical/mean density
+        overdensity_type : {"critical", "mean"}, optional
+            Specifies whether the overdensity factor is with respect
+            to the critical or mean density of the Universe. Default
+            is `None`, in which case the value of the attribute
+            `overdensity_type` is used.
+
+        Returns:
+        --------
+        radius : astropy.quantity.Quantity
+            Radius inside which the average halo density is
+            `overdensity` times the critical/mean density of the
+            Universe.
+        """
         if overdensity_type is None:
             overdensity_type = self._overdensity_type
         x0 = opt.brentq(self._mean_density_zero, 1e-6, 10,
-                        args=(Delta, overdensity_type))
+                        args=(overdensity, overdensity_type))
         return x0 * u.Mpc
 
-    def mass_Delta(self, Delta, overdensity_type=None):
-        """Find the mass inside a radius inside which the mean density
-        is Delta times the critical density. Returns mass in M_sun."""
+    def mass_Delta(self, overdensity, overdensity_type=None):
+        """Compute the mass inside radius which contains a given overdensity.
+
+        Parameters:
+        -----------
+        overdensity : float
+            Overdensity factor with respect to the critical/mean density
+        overdensity_type : {"critical", "mean"}, optional
+            Specifies whether the overdensity factor is with respect
+            to the critical or mean density of the Universe. Default
+            is `None`, in which case the value of the attribute
+            `overdensity_type` is used.
+
+        Returns:
+        --------
+        mass : astropy.quantity.Quantity
+            Halo mass inside the radius which contains an overdensity
+            of factor `overdensity` with respect to the critical/mean
+            density.
+        """
         if overdensity_type is None:
             overdensity_type = self._overdensity_type
-        r = self.radius_Delta(Delta, overdensity_type)
+        r = self.radius_Delta(overdensity, overdensity_type)
         return self.mass(r)
 
     def density(self, r):
-        """Compute the density rho of an NFW halo at radius r (in Mpc)
-        from the center of the halo. Returns M_sun/Mpc^3."""
+        """Compute the density radius r from the center of the halo.
+
+        Parameters:
+        -----------
+        r : float or astropy.quantity.Quantity
+            Distance from the halo center. If the argument is float,
+            Mpc are assumed.
+
+        Returns:
+        --------
+        rho : astropy.quantity.Quantity
+            Density of the NFW halo at a distance `r` from the halo center.
+        """
         r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
         return self.rho_c * self.delta_c/(x * (1+x)**2)
 
     def mean_density(self, r):
-        """Compute the mean density inside a radius r (in Mpc). Returns
-        M_sun/Mpc^3.
+        """Compute the mean density inside a radius.
+
+        Parameters:
+        -----------
+        r : float or astropy.quantity.Quantity
+            Distance from the halo center. If the argument is float,
+            Mpc are assumed.
+
+        Returns:
+        --------
+        rho_bar : astropy.quantity.Quantity
+            Mean density of the NFW halo inside the radius `r`.
         """
         r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
@@ -242,24 +391,36 @@ class NFW(object):
             * (np.log((1 + x)) - x/(1 + x))
 
     def mass(self, r):
-        """Compute the mass of an NFW halo inside radius r (in Mpc)
-        from the center of the halo. Returns mass in M_sun."""
+        """Compute the mass inside radius r.
+
+        Parameters:
+        -----------
+        r : float or astropy.quantity.Quantity
+            Distance from the halo center. If the argument is float,
+            Mpc are assumed.
+
+        Returns:
+        --------
+        mass : astropy.quantity.Quantity
+            Mass contained within the radius `r`.
+        """
         r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
         return 4 * np.pi * self.delta_c * self.rho_c * self.r_s**3 \
             * (np.log((1 + x)) - x/(1 + x))
 
     def projected_mass(self, r):
-        """Compute the projected mass of the NFW profile inside a cylinder of
-        radius r.
+        """Compute the projected mass of the NFW profile inside a cylinder.
 
         Parameters:
-        ===========
-        r: float or astropy.Quantity, radius of the cylinder
+        -----------
+        r : float or astropy.quantity.Quantity
+            Radius of the cylinder. If the argument is float, Mpc are assumed.
 
         Returns:
-        ========
-        m_proj: astropy.Quantity, projected mass in the cylinder
+        --------
+        m_proj: astropy.quantity.Quantity
+            Projected mass in the cylinder of radius `r`.
         """
         r = u.Quantity(r, u.Mpc)
         x = (r / self.r_s).value
@@ -269,8 +430,19 @@ class NFW(object):
         return m_proj
 
     def sigma(self, r):
-        """Compute the surface mass density of the halo at distance r
-        (in Mpc) from the halo center."""
+        """Compute the surface mass density distance r.
+
+        Parameters:
+        -----------
+        r : float or astropy.quantity.Quantity
+            Projected distance from the halo cener. If the argument is
+            float, Mpc are assumed.
+
+        Returns:
+        --------
+        sigma : astropy.quantity.Quantity
+            Surface mass density of the halo at projected distance `r`.
+        """
         r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
         val1 = 1 / (x**2 - 1)
@@ -278,8 +450,20 @@ class NFW(object):
         return 2 * self.r_s * self.rho_c * self.delta_c * (val1-val2)
 
     def delta_sigma(self, r):
-        """Compute the Delta surface mass density of the halo at
-        radius r (in Mpc) from the halo center."""
+        """Compute the surface mass density minus its mean at radius r.
+
+        Parameters:
+        -----------
+        r : float or astropy.quantity.Quantity
+            Projected distance from the halo cener. If the argument is
+            float, Mpc are assumed.
+
+        Returns:
+        --------
+        delta_sigma : astropy.quantity.Quantity
+            Surface mass density at distance `r` minus the mean
+            surface mass density inside the same radius.
+        """
         r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
         fac = 2 * self.r_s * self.rho_c * self.delta_c
