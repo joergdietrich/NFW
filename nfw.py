@@ -354,7 +354,7 @@ class NFW(object):
         return self.mass(r)
 
     def density(self, r):
-        """Compute the density radius r from the center of the halo. 
+        """Compute the density radius r from the center of the halo.
 
         Parameters:
         -----------
