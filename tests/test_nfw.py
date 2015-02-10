@@ -157,7 +157,10 @@ class TestNFW(TestCase):
         z = 0.4
         nfw1 = NFW(m200, c, z)
         nfw2 = NFW(m200 * u.solMass, c, z)
-        assert_almost_equal(nfw1.radius_Delta(200), nfw2.radius_Delta(200))
+        r1 = nfw1.radius_Delta(200)
+        r2 = nfw2.radius_Delta(200)
+        r1 = u.Quantity(r1, r2.unit)
+        assert_almost_equal(r1.value, r2.value)
 
     def test_radius_unit_consistency(self):
         r200 = 1.5
@@ -166,8 +169,13 @@ class TestNFW(TestCase):
         nfw1 = NFW(r200, c, z, size_type='radius')
         nfw2 = NFW(r200 * u.Mpc, c, z, size_type='radius')
         nfw3 = NFW(r200*1000 * u.kiloparsec, c, z, size_type='radius')
-        assert_almost_equal(nfw1.mass_Delta(200), nfw2.mass_Delta(200))
-        assert_almost_equal(nfw1.mass_Delta(200), nfw3.mass_Delta(200))
+        m200_1 = nfw1.mass_Delta(200)
+        m200_2 = nfw2.mass_Delta(200)
+        m200_3 = nfw3.mass_Delta(200)
+        m200_1 = u.Quantity(m200_1, m200_3.unit)
+        m200_2 = u.Quantity(m200_2, m200_3.unit)
+        assert_almost_equal(m200_1.value, m200_2.value)
+        assert_almost_equal(m200_1.value, m200_3.value)
 
     def test_cosmo_consistency(self):
         save_cosmo = astropy.cosmology.default_cosmology.get()
@@ -182,12 +190,14 @@ class TestNFW(TestCase):
         wmap9 = astropy.cosmology.WMAP9
         nfw3 = NFW(m200, c, z, cosmology=wmap9)
 
-        assert_almost_equal(nfw1.radius_Delta(200), nfw2.radius_Delta(200),
+        assert_almost_equal(nfw1.radius_Delta(200).value,
+                            nfw2.radius_Delta(200).value,
                             err_msg=
                             "Disagreement after init with same cosmology")
         astropy.cosmology.default_cosmology.set(wmap9)
         try:
-            assert_almost_equal(nfw1.radius_Delta(200), nfw3.radius_Delta(200),
+            assert_almost_equal(nfw1.radius_Delta(200).value,
+                                nfw3.radius_Delta(200).value,
                                 err_msg=
                                 "Disagreement after changing cosmology")
         except:
