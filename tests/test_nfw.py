@@ -14,7 +14,7 @@ class TestNFW(TestCase):
     @classmethod
     def setup_class(cls):
         cls._cosmo = astropy.cosmology.FlatLambdaCDM(70, 0.3, Tcmb0=0)
-        astropy.cosmology.set_current(cls._cosmo)
+        astropy.cosmology.default_cosmology.set(cls._cosmo)
 
     def test_faulty_init(self):
         assert_raises(ValueError, NFW, 1e15, 5, 0, 'size_type="foo"')
@@ -170,7 +170,7 @@ class TestNFW(TestCase):
         assert_almost_equal(nfw1.mass_Delta(200), nfw3.mass_Delta(200))
 
     def test_cosmo_consistency(self):
-        save_cosmo = astropy.cosmology.get_current()
+        save_cosmo = astropy.cosmology.default_cosmology.get()
         m200 = 5e14
         c = 3.5
         z = 0.15
@@ -185,15 +185,15 @@ class TestNFW(TestCase):
         assert_almost_equal(nfw1.radius_Delta(200), nfw2.radius_Delta(200),
                             err_msg=
                             "Disagreement after init with same cosmology")
-        astropy.cosmology.set_current(wmap9)
+        astropy.cosmology.default_cosmology.set(wmap9)
         try:
             assert_almost_equal(nfw1.radius_Delta(200), nfw3.radius_Delta(200),
                                 err_msg=
                                 "Disagreement after changing cosmology")
         except:
-            astropy.cosmology.set_current(save_cosmo)
+            astropy.cosmology.default_cosmology.set(save_cosmo)
             raise
-        astropy.cosmology.set_current(save_cosmo)
+        astropy.cosmology.default_cosmology.set(save_cosmo)
 
     def test_var_cosmo_attr(self):
         m200 = 5e14
@@ -201,24 +201,25 @@ class TestNFW(TestCase):
         z = 0.15
         nfw1 = NFW(m200, c, z)
         assert(nfw1.var_cosmology)
-        nfw2 = NFW(m200, c, z, cosmology=astropy.cosmology.get_current())
+        nfw2 = NFW(m200, c, z,
+                   cosmology=astropy.cosmology.default_cosmology.get())
         assert(not nfw2.var_cosmology)
 
     def test_var_cosmo_obj(self):
         wmap9 = astropy.cosmology.WMAP9
-        save_cosmo = astropy.cosmology.get_current()
+        save_cosmo = astropy.cosmology.default_cosmology.get()
         m200 = 5e14
         c = 3.5
         z = 0.15
         nfw = NFW(m200, c, z)
         assert(nfw.cosmology is save_cosmo)
-        astropy.cosmology.set_current(wmap9)
+        astropy.cosmology.default_cosmology.set(wmap9)
         try:
             assert(nfw.cosmology is wmap9)
         except:
-            astropy.cosmology.set_current(save_cosmo)
+            astropy.cosmology.default_cosmology.set(save_cosmo)
             raise
         # Ensure that accessing the cosmology property also updates
         # the other properties.
         assert_almost_equal(nfw.radius_Delta(325).value, 1.2525923457595705)
-        astropy.cosmology.set_current(save_cosmo)
+        astropy.cosmology.default_cosmology.set(save_cosmo)

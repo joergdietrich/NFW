@@ -95,7 +95,8 @@ class NFW(object):
     current astropy cosmology changes after instantiation, the NFW
     instance will follow this change. If you want to explicitly keep
     the NFW instance fixed at the current cosmology *at instantiation*
-    you should pass `cosmology=astropy.cosmology.get_current()` to
+    you should pass
+    `cosmology=astropy.cosmology.default_cosmology.get()` to
     __init__().
 
     References:
@@ -126,7 +127,7 @@ class NFW(object):
             self._cosmology = cosmology
             self._var_cosmology = False
         else:
-            self._cosmology = astropy.cosmology.get_current()
+            self._cosmology = astropy.cosmology.default_cosmology.get()
             self._var_cosmology = True
 
         if size_type == "mass":
@@ -147,13 +148,13 @@ class NFW(object):
         """
         if not self._var_cosmology:
             return False
-        if self._cosmology == astropy.cosmology.get_current():
+        if self._cosmology == astropy.cosmology.default_cosmology.get():
             return False
         return True
 
     def _update_new_cosmology(self):
         if self._var_cosmology:
-            self._cosmology = astropy.cosmology.get_current()
+            self._cosmology = astropy.cosmology.default_cosmology.get()
         self._update_rho_c()
         self._update_r_Delta()
         self._update_r_s()
