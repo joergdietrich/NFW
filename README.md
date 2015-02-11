@@ -23,3 +23,7 @@ This implementation of the NFW halo properties depends on
 ## Author
 
 Jörg Dietrich <astro@joergdietrich.com>
+
+## Build status
+
+[![Build Status](https://travis-ci.org/joergdietrich/NFW?branch=master)](https://travis-ci.org/joergdietrich/NFW)
