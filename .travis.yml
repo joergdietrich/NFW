@@ -15,7 +15,7 @@ matrix:
       env: NUMPY=1.8 SCIPY=0.14 ASTROPY=0.4
 
     - python: 3.4
-      env: NUMPY-1.9 SCIPY=0.15 ASTROPY=0.4
+      env: NUMPY=1.9 SCIPY=0.15 ASTROPY=0.4
 
 before_install:
 
