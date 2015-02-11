@@ -15,7 +15,7 @@ matrix:
       env: NUMPY=1.8 SCIPY=0.14 ASTROPY=0.4
 
     - python: 3.4
-      env: NUMPY-1.9 SCIPY=0.15
+      env: NUMPY-1.9 SCIPY=0.15 ASTROPY=0.4
 
 before_install:
 
@@ -47,7 +47,5 @@ install:
 
   # - pip install ...
 
-script:
-
-  - py.test  # will run all tests in the package
+script: nosetests
 
