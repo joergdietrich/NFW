@@ -48,6 +48,5 @@ install:
   # - pip install ...
 
 script:
-    python -c "import astropy"
-    nosetests
+    python -c "import astropy.cosmology" && nosetests
 
