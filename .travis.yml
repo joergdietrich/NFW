@@ -9,13 +9,13 @@ matrix:
     # add/remove environment variables, and use them below during the install.
 
     - python: 2.7
-      env: NUMPY=1.9 SCIPY=0.15 ASTROPY=0.4
+      env: NUMPY=1.9
 
     - python: 2.7
-      env: NUMPY=1.8 SCIPY=0.14 ASTROPY=0.4
+      env: NUMPY=1.8
 
     - python: 3.4
-      env: NUMPY=1.9 SCIPY=0.15 ASTROPY=0.4
+      env: NUMPY=1.9
 
 before_install:
 
@@ -41,7 +41,7 @@ install:
   # the first package to install (for every conda install command) otherwise
   # numpy may be automatically upgraded.
 
-  - conda install --yes numpy=$NUMPY scipy=$SCIPY astropy=$ASTROPY
+  - conda install --yes numpy=$NUMPY scipy astropy
 
   # You can also install some dependencies with pip if not available in conda
 
