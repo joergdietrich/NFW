@@ -4,6 +4,7 @@ from numpy.testing import (TestCase, assert_array_equal, assert_equal,
                            assert_raises)
 from numpy.testing.decorators import knownfailureif
 
+import astropy
 import astropy.cosmology
 from astropy import units as u
 
