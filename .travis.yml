@@ -17,6 +17,9 @@ matrix:
     - python: 3.4
       env: NUMPY=1.9
 
+    - python: 3.4
+      env NUMPY=stable SCIPY=stable ASTROPY=stable
+      
 before_install:
 
   # Here we just install Miniconda, which you shouldn't have to change.
@@ -41,7 +44,7 @@ install:
   # the first package to install (for every conda install command) otherwise
   # numpy may be automatically upgraded.
 
-  - conda install --yes numpy=$NUMPY scipy astropy nose
+  - conda install --yes numpy=$NUMPY scipy astropy=$ASTROPY nose
 
   # You can also install some dependencies with pip if not available in conda
 
