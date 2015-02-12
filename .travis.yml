@@ -18,7 +18,7 @@ matrix:
       env: NUMPY=1.9
 
     - python: 3.4
-      env NUMPY=stable SCIPY=stable ASTROPY=stable
+      env: NUMPY=stable SCIPY=stable ASTROPY=stable
       
 before_install:
 
