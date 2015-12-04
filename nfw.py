@@ -13,8 +13,8 @@ from astropy import units as u
 def arcsec(z):
     """Compute the inverse sec of the complex number z."""
     val1 = 1j / z
-    val2 = sm.sqrt(1 - 1./z**2)
-    val = 1.j * np.log(val2 + val1)
+    val2 = sm.sqrt(1 - 1/z**2)
+    val = 1j * np.log(val2 + val1)
     return 0.5 * np.pi + val
 
 
@@ -436,7 +436,7 @@ class NFW(object):
         Parameters:
         -----------
         r : float or astropy.quantity.Quantity
-            Projected distance from the halo cener. If the argument is
+            Projected distance from the halo center. If the argument is
             float, Mpc are assumed.
 
         Returns:
