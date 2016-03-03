@@ -56,9 +56,8 @@ def mdelta_to_mdelta(m, func, overdensity_in, overdensity_out, args=()):
         mass of halo at Delta times critical overdensity
 
     Notes:
-    ======
-    Halo masses must be given in physical units with factors of h
-    divided out.
+    ====== 
+    Halo masses must be given in units expected by the M-c relation.
     """
     m_in = u.Quantity(m, u.solMass)
     delta_ratio = overdensity_in / overdensity_out
@@ -92,8 +91,7 @@ def mdelta_to_m200(m, func, overdensity, args=()):
 
     Notes:
     ======
-    Halo masses must be given in physical units with factors of h
-    divided out.
+    Halo masses must be given in units expected by the M-c relation.
     """
     return mdelta_to_mdelta(m, func, overdensity, 200, args)
 
