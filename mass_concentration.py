@@ -71,6 +71,30 @@ def mdelta_to_mdelta(m, func, overdensity_in, overdensity_out, args=()):
 
 
 def mdelta_to_m200(m, func, overdensity, args=()):
+    """
+    Convenience function for mdelta_to_mdelta with output overdensity 200.
+
+    Parameters:
+    ===========
+    m: float or astropy.Quantity
+        mass of halo
+    func: callable func(m200c, *args)
+        Mass-concentration scaling relation
+    overdensity: float
+        Overdensity in units of rho_crit at which halo mass is set
+    args: tuple, optional
+        Extra arguments passed to func, i.e., ``f(x, *args)``.
+
+    Returns:
+    ========
+    m200: astropy.Quantity
+        mass of halo at 200 times critical overdensity
+
+    Notes:
+    ======
+    Halo masses must be given in physical units with factors of h
+    divided out.
+    """
     return mdelta_to_mdelta(m, func, overdensity, 200, args)
 
 
