@@ -6,7 +6,14 @@ from numpy.testing.decorators import knownfailureif
 
 import astropy.cosmology
 from astropy import units as u
-from astropy.tests.helper import assert_quantity_allclose
+try:
+    from astropy.tests.helper import assert_quantity_allclose
+except ImportError:
+    # Monkey patching failing travis test for numpy-1.8
+    def assert_quantity_allclose(x, y):
+        x = x.to(y.unit)
+        np.testing.assert_allclose(x.value, y.value)
+    
 
 import mass_concentration
 from nfw import NFW
