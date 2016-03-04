@@ -15,7 +15,7 @@ def _diff_c(c1, c0, delta_ratio):
 
 def _findc(c0, overdensity_in, overdensity_out):
     delta_ratio = overdensity_out / overdensity_in    
-    return opt.brentq(_diff_c, .1, 100, args=(c0, delta_ratio))
+    return opt.brentq(_diff_c, .01, 1000, args=(c0, delta_ratio))
 
 def _delta_fac(c):
     return np.log(1 + c) - c / (1 + c)
@@ -60,9 +60,12 @@ def mdelta_to_mdelta(m, func, overdensity_in, overdensity_out, args=()):
     Halo masses must be given in units expected by the M-c relation.
     """
     m_in = u.Quantity(m, u.solMass)
+    if overdensity_in == overdensity_out:
+        # brentq will fail for identical
+        return m_in
     delta_ratio = overdensity_in / overdensity_out
-    m_min = m_in / (delta_ratio * 5)
-    m_max = m_in * (delta_ratio * 5)
+    m_min = u.Quantity(1e5, u.solMass)
+    m_max = u.Quantity(1e25, u.solMass)
     mdelta = opt.brentq(_find_m200, m_min.value, m_max.value,
                        args=(func, overdensity_in, overdensity_out, m_in) \
                         + args)
