@@ -120,6 +120,8 @@ def dolag_concentration(m200, z, cosmo):
     Halo masses must be given in physical units with factors of h
     divided out.
     """
+    m200 = np.asanyarray(m200)
+    z = np.asanyarray(z)
     m200 = u.Quantity(m200 * cosmo.h, u.solMass).value
     conc = 9.59 / (1 + z) * (m200 / 1e14)**-0.102
     return conc
@@ -133,15 +135,15 @@ def duffy_concentration(m200, z, cosmo):
     Parameters:
     ===========
 
-    m200: float or astropy.Quantity
+    m200: float, array_like or astropy.Quantity
         Mass of halo at 200rho_crit, [Msun] if float
-    z: float
+    z: float or array_like
         Halo redshift
     cosmo: astropy.cosmology
 
     Returns:
     ========
-    conc: float
+    conc: float or array
         Halo concentration
 
     Notes:
@@ -150,6 +152,8 @@ def duffy_concentration(m200, z, cosmo):
     divided out.
     """
 
+    m200 = np.asanyarray(m200)
+    z = np.asanyarray(z)
     m200 = u.Quantity(m200 * cosmo.h, u.solMass)
     a = 5.71
     b = -0.084
