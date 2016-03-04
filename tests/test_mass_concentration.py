@@ -93,3 +93,16 @@ class TestMc(TestCase):
         nfw = NFW(mdelta, c, z)
         m_out = nfw.mass_Delta(500)
         assert(quantity_allclose(m_in, m_out))
+
+    def test_mdelta_to_m200(self):
+        # consistency with mdelta_to_mdelta
+        m_in = 2e14
+        z = 0.2
+        func = mass_concentration.dolag_concentration
+        delta_in = 450
+        md1 = mass_concentration.mdelta_to_m200(m_in, func, delta_in,
+                                                (z, self._cosmo))
+        md2 = mass_concentration.mdelta_to_mdelta(m_in, func,
+                                                  delta_in, 200,
+                                                  (z, self._cosmo))
+        assert(quantity_allclose(md1, md2))
