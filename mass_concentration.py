@@ -59,6 +59,8 @@ def mdelta_to_mdelta(m, func, overdensity_in, overdensity_out, args=()):
     ====== 
     Halo masses must be given in units expected by the M-c relation.
     """
+    if overdensity_in < overdensity_out:
+        raise ValueError("mdelta_to_mdelta currently broken for overdensity_in < overdensity_out")
     m_in = u.Quantity(m, u.solMass)
     if overdensity_in == overdensity_out:
         # brentq will fail for identical
