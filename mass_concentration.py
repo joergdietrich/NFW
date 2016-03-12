@@ -28,7 +28,7 @@ def _find_m200(m200, *args):
     my_args = args[4:]
     c0 = func(m200, *my_args)
     c1 = _findc(c0, overdensity_in, overdensity_out)
-    return m200/m_in.value - _delta_fac(c0) / _delta_fac(c1)
+    return m200 / m_in.value - _delta_fac(c0) / _delta_fac(c1)
 
 
 def mdelta_to_mdelta(m, func, overdensity_in, overdensity_out, args=()):
