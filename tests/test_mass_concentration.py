@@ -67,10 +67,7 @@ class TestMc(TestCase):
         z = 0, 0.5, 1
         func = mass_concentration.dolag_concentration
         # common cases:
-        mdelta = mass_concentration.mdelta_to_mdelta(5e14, func, 200, 500,
-                                                     (0.3, self._cosmo))
-        assert_quantity_allclose(mdelta,
-                                 u.Quantity(397021380489815.56, u.solMass))
+
         mdelta = mass_concentration.mdelta_to_mdelta(1e14, func, 2500, 500,
                                                      (0, self._cosmo))    
         assert_quantity_allclose(mdelta,
@@ -100,6 +97,12 @@ class TestMc(TestCase):
         nfw = NFW(mdelta, c, z)
         m_out = nfw.mass_Delta(500)
         assert_quantity_allclose(m_in, m_out)
+
+        mdelta1 = mass_concentration.mdelta_to_mdelta(m_in, func, 200, 500,
+                                                      (z, self._cosmo))
+        nfw = NFW(m_in, func(m_in, z, self._cosmo), z)
+        mdelta2 = nfw.mass_Delta(500)
+        assert_quantity_allclose(mdelta1, mdelta2)
 
     def test_mdelta_to_m200(self):
         # consistency with mdelta_to_mdelta
