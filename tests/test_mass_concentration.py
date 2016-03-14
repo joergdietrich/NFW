@@ -136,12 +136,11 @@ class TestMc(TestCase):
         md2 = mass_concentration.mdelta_to_mdelta(m_in, func,
                                                   delta_in, 200,
                                                   (z, self._cosmo))
-#        assert_quantity_allclose(md1, md2)
+        assert_quantity_allclose(md1, md2)
         # consistency with mass_Delta in NFW
         nfw = NFW(md1, func(md1, z, self._cosmo), z)
         m_out = nfw.mass_Delta(450)
         assert_quantity_allclose(m_in, m_out)
-
 
     def test_m200_to_mdelta(self):
         m_in = u.Quantity(4e14, u.solMass)
