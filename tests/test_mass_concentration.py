@@ -62,12 +62,11 @@ class TestMc(TestCase):
         assert(isinstance(c, float))
         
     def test_mdelta_to_mdelta(self):
-        overdensity = 50, 100, 199, 200, 500, 2500
-        m_in = 1e9, 1e13, 1e14, 1e15, 1e16
-        z = 0, 0.5, 1
-        func = mass_concentration.dolag_concentration
+        #overdensity = 50, 100, 199, 200, 500, 2500
+        #m_in = 1e9, 1e13, 1e14, 1e15, 1e16
+        #z = 0, 0.5, 1
+        func = mass_concentration.duffy_concentration
         # common cases:
-
         mdelta = mass_concentration.mdelta_to_mdelta(1e14, func, 2500, 500,
                                                      (0, self._cosmo))    
         assert_quantity_allclose(mdelta,
@@ -105,14 +104,18 @@ class TestMc(TestCase):
         assert_quantity_allclose(mdelta1, mdelta2)
 
     def test_mdelta_to_m200(self):
-        # consistency with mdelta_to_mdelta
-        m_in = 2e14
+        m_in = u.Quantity(2e14, u.solMass)
         z = 0.2
-        func = mass_concentration.dolag_concentration
+        func = mass_concentration.duffy_concentration
         delta_in = 450
+        # consistency with mdelta_to_mdelta
         md1 = mass_concentration.mdelta_to_m200(m_in, func, delta_in,
                                                 (z, self._cosmo))
         md2 = mass_concentration.mdelta_to_mdelta(m_in, func,
                                                   delta_in, 200,
                                                   (z, self._cosmo))
         assert_quantity_allclose(md1, md2)
+        # consistency with mass_Delta in NFW
+        nfw = NFW(md2, func(md2, z, self._cosmo), z)
+        m_out = nfw.mass_Delta(450)
+        assert_quantity_allclose(m_in, m_out)
