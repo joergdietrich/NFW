@@ -71,7 +71,7 @@ def mdelta_to_mdelta(m, func, overdensity_in, overdensity_out, args=()):
         mass of halo at Delta times critical overdensity
 
     Notes:
-    ====== 
+    ======
     Halo masses must be given in units expected by the M-c relation.
     """
     m200 = mdelta_to_m200(m, func, overdensity_in, args)
@@ -112,7 +112,7 @@ def mdelta_to_m200(m, func, overdensity, args=()):
     m_min = u.Quantity(1e5, u.solMass)
     m_max = u.Quantity(1e25, u.solMass)
     mdelta = opt.brentq(_find_m200, m_min.value, m_max.value,
-                       args=(func, overdensity, m_in) + args)
+                        args=(func, overdensity, m_in) + args)
     return u.Quantity(mdelta, u.solMass)
 
 
@@ -150,7 +150,7 @@ def m200_to_mdelta(m, func, overdensity, args=()):
     m_min = u.Quantity(1e5, u.solMass)
     m_max = u.Quantity(1e25, u.solMass)
     mdelta = opt.brentq(_find_mdelta, m_min.value, m_max.value,
-                       args=(func, overdensity, m_in) + args)
+                        args=(func, overdensity, m_in) + args)
     return u.Quantity(mdelta, u.solMass)
 
 

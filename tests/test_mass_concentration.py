@@ -13,7 +13,7 @@ except ImportError:
     def assert_quantity_allclose(x, y):
         x = x.to(y.unit)
         np.testing.assert_allclose(x.value, y.value)
-    
+
 
 import mass_concentration
 from nfw import NFW
@@ -35,7 +35,7 @@ class TestMc(TestCase):
         c = mass_concentration.duffy_concentration(m200, zl, self._cosmo)
         assert_almost_equal(c, result)
         assert(isinstance(c, np.ndarray))
-        # Assure results stay the same 
+        # Assure results stay the same
         m200 = u.Quantity(m200, u.solMass)
         c = mass_concentration.duffy_concentration(m200, zl, self._cosmo)
         assert_almost_equal(c, result)
@@ -53,7 +53,7 @@ class TestMc(TestCase):
         c = mass_concentration.dolag_concentration(m200, zl, self._cosmo)
         assert_almost_equal(c, result)
         assert(isinstance(c, np.ndarray))
-        # Assure results stay the same 
+        # Assure results stay the same
         m200 = u.Quantity(m200, u.solMass)
         c = mass_concentration.dolag_concentration(m200, zl, self._cosmo)
         assert_almost_equal(c, result)
@@ -68,7 +68,7 @@ class TestMc(TestCase):
         nfw = NFW(m200, func(m200, z, self._cosmo), z)
         m_out = nfw.mass_Delta(overdensity_out)
         return m_out
-        
+
     def test_mdelta_to_mdelta(self):
         func = mass_concentration.duffy_concentration
         # Consistency
@@ -90,7 +90,7 @@ class TestMc(TestCase):
         m_in = u.Quantity(1e14, u.solMass)
         z = 0
         mdelta1 = mass_concentration.mdelta_to_mdelta(m_in, func, 2500, 500,
-                                                     (z, self._cosmo))
+                                                      (z, self._cosmo))
         mdelta2 = self._mdelta_to_mdelta_via_m200(m_in, func, 2500, 500, z)
         assert_quantity_allclose(mdelta1, mdelta2)
 
@@ -99,9 +99,9 @@ class TestMc(TestCase):
         m_in = u.Quantity(1e14, u.solMass)
         z = 1
         m200 = mass_concentration.mdelta_to_mdelta(m_in, func, 199, 200,
-                                                     (z, self._cosmo))
+                                                   (z, self._cosmo))
         m_out = mass_concentration.mdelta_to_mdelta(m200, func, 200, 199,
-                                                     (z, self._cosmo))
+                                                    (z, self._cosmo))
         assert_quantity_allclose(m_in, m_out)
 
         # identical input/output overdensity
@@ -113,7 +113,7 @@ class TestMc(TestCase):
         m_in = 1e15
         z = 0
         mdelta1 = mass_concentration.mdelta_to_mdelta(m_in, func, 2500, 50,
-                                                     (z, self._cosmo))
+                                                      (z, self._cosmo))
         mdelta2 = self._mdelta_to_mdelta_via_m200(m_in, func, 2500, 50, z)
         assert_quantity_allclose(mdelta1, mdelta2)
 
@@ -121,7 +121,7 @@ class TestMc(TestCase):
         m_in = 1e9
         z = 1
         mdelta1 = mass_concentration.mdelta_to_mdelta(m_in, func, 50, 2500,
-                                                     (z, self._cosmo))
+                                                      (z, self._cosmo))
         mdelta2 = self._mdelta_to_mdelta_via_m200(m_in, func, 50, 2500, z)
         assert_quantity_allclose(mdelta1, mdelta2)
 
