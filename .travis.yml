@@ -10,13 +10,13 @@ matrix:
     # add/remove environment variables, and use them below during the install.
 
     - python: 2.7
-      env: NUMPY=1.9
+      env: NUMPY=1.10
 
     - python: 2.7
-      env: NUMPY=1.8
-
-    - python: 3.4
       env: NUMPY=1.9
+
+    - python: 3.5
+      env: NUMPY=1.10
 
 before_install:
 
