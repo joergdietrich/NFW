@@ -48,6 +48,12 @@ install:
 
   # - pip install ...
 
-script:
-    nosetests
+  pip install coveralls
+  
 
+script:
+    nosetests --with-coverage --cover-package=mass_concentration,nfw
+
+
+after_success:
+    coveralls
