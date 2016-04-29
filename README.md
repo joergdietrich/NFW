@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/joergdietrich/NFW.svg?branch=master)](https://travis-ci.org/joergdietrich/NFW)
 [![Coverage Status](https://coveralls.io/repos/github/joergdietrich/NFW/badge.svg?branch=coveralls)](https://coveralls.io/github/joergdietrich/NFW?branch=coveralls)
-
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.50664.svg)](http://dx.doi.org/10.5281/zenodo.50664)
 
 This class implements the NFW (Navarro, Julio F.  Frenk, Carlos S.
 White, Simon D. M., "A Universal Density Profile from Hierarchical
