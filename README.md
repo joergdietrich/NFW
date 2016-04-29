@@ -1,8 +1,7 @@
 # Navarro-Frenk-White (NFW) Halo Class
 
 [![Build Status](https://travis-ci.org/joergdietrich/NFW.svg?branch=master)](https://travis-ci.org/joergdietrich/NFW)
-
-[![Coverage Status](https://coveralls.io/repos/github/joergdietrich/NFW/badge.svg?branch=master)](https://coveralls.io/github/joergdietrich/NFW?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/joergdietrich/NFW/badge.svg?branch=coveralls)](https://coveralls.io/github/joergdietrich/NFW?branch=coveralls)
 
 
 This class implements the NFW (Navarro, Julio F.  Frenk, Carlos S.
