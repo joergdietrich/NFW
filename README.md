@@ -1,5 +1,10 @@
 # Navarro-Frenk-White (NFW) Halo Class
 
+[![Build Status](https://travis-ci.org/joergdietrich/NFW.svg?branch=master)](https://travis-ci.org/joergdietrich/NFW)
+
+[![Coverage Status](https://coveralls.io/repos/github/joergdietrich/NFW/badge.svg?branch=master)](https://coveralls.io/github/joergdietrich/NFW?branch=master)
+
+
 This class implements the NFW (Navarro, Julio F.  Frenk, Carlos S.
 White, Simon D. M., "A Universal Density Profile from Hierarchical
 Clustering", The Astrophysical Journal vol. 490, pp. 493-508, 1997)
@@ -24,6 +29,3 @@ This implementation of the NFW halo properties depends on
 
 Jörg Dietrich <astro@joergdietrich.com>
 
-## Build status
-
-[![Build Status](https://travis-ci.org/joergdietrich/NFW.svg?branch=master)](https://travis-ci.org/joergdietrich/NFW)
