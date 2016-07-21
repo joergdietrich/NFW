@@ -15,8 +15,8 @@ except ImportError:
         np.testing.assert_allclose(x.value, y.value)
 
 
-import mass_concentration
-from nfw import NFW
+from NFW import mass_concentration
+from NFW.nfw import NFW
 
 
 class TestMc(TestCase):
