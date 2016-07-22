@@ -52,7 +52,7 @@ install:
   
 
 script:
-    nosetests --with-coverage --cover-package=mass_concentration,nfw
+    nosetests --with-coverage --cover-package=NFW.mass_concentration,NFW.nfw
 
 
 after_success:

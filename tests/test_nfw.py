@@ -7,7 +7,7 @@ from numpy.testing.decorators import knownfailureif
 import astropy.cosmology
 from astropy import units as u
 
-from nfw import NFW
+from NFW.nfw import  NFW
 
 
 class TestNFW(TestCase):
