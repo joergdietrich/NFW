@@ -17,10 +17,9 @@ class TestNFW(TestCase):
         astropy.cosmology.default_cosmology.set(cls._cosmo)
 
     def test_faulty_init(self):
-        assert_raises(ValueError, NFW, 1e15, 5, 0, 'size_type="foo"')
+        assert_raises(ValueError, NFW, 1e15, 5, 0, **{'size_type': "foo"})
         assert_raises(ValueError, NFW, 1e15, 5, 0,
-                      'size_type="mass"',
-                      'overdensity_type="bar"')
+                      **{'overdensity_type': "bar"})
 
     def test_mass_init(self):
         m200 = 1e15 * u.solMass
