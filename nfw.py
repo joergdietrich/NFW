@@ -301,7 +301,7 @@ class NFW(object):
             rho = self.rho_c
         else:
             rho = self.rho_c * self.cosmology.Om(self.z)
-        return (self.mean_density(r) - Delta*rho).value
+        return (self.mean_density(r) - Delta * rho).value
 
     def radius_Delta(self, overdensity, overdensity_type=None):
         """Compute the radius which contains a given overdensity.
