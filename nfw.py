@@ -295,8 +295,9 @@ class NFW(object):
         return self.__str__()
 
     def _mean_density_zero(self, r, Delta, overdensity_type=None):
-        if overdensity_type is None:
-            overdensity_type = self._overdensity_type
+        # make sure all functions calling this one set overdensity_type
+        # appropriately
+        assert (overdensity_type is not None)
         if overdensity_type == 'critical':
             rho = self.rho_c
         else:

@@ -7,7 +7,7 @@ from numpy.testing.decorators import knownfailureif
 import astropy.cosmology
 from astropy import units as u
 
-from NFW.nfw import  NFW
+from NFW.nfw import NFW
 
 
 class TestNFW(TestCase):
@@ -21,6 +21,11 @@ class TestNFW(TestCase):
         assert_raises(ValueError, NFW, 1e15, 5, 0,
                       **{'overdensity_type': "bar"})
 
+    def test_overdensity_init(self):
+        nfw = NFW(1e15, 4, 0.3, overdensity=500, overdensity_type="mean")
+        assert_equal(nfw.overdensity, 500)
+        assert (nfw.overdensity_type == "mean")
+        
     def test_mass_init(self):
         m200 = 1e15 * u.solMass
         c = 5.
