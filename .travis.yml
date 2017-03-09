@@ -21,8 +21,11 @@ matrix:
     # Try a few older versions for old python
     - python: 2.7
       env: NUMPY=1.10
+    - python: 2.7      
       env: NUMPY=1.9
+    - python: 2.7      
       env: SCIPY=0.12
+    - python: 2.7      
       env: ASTROPY=1.0
     
     - python: 3.5
