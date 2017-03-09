@@ -282,21 +282,10 @@ class NFW(object):
         overdensity_type = overdensity_type
         return self.radius_Delta(overdensity, overdensity_type) / self.r_s
 
-    def __str__(self):
-        prop_str = "NFW halo with concentration %.2g at redshift %.2f:\n\n" \
-                   % (self.c, self.z,)
-        for delta in (200, 500, 2500):
-            prop_str += "M_%d = %.2e M_sun\tr_%d = %.2g Mpc\n" % \
-                        (delta, self.mass_Delta(delta).value, delta,
-                         self.radius_Delta(delta).value)
-        return prop_str
-
-    def __repr__(self):
-        return self.__str__()
-
     def _mean_density_zero(self, r, Delta, overdensity_type=None):
-        if overdensity_type is None:
-            overdensity_type = self._overdensity_type
+        # make sure all functions calling this one set overdensity_type
+        # appropriately
+        assert (overdensity_type is not None)
         if overdensity_type == 'critical':
             rho = self.rho_c
         else:

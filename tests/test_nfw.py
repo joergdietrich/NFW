@@ -1,13 +1,12 @@
 import numpy as np
-from numpy.testing import (TestCase, assert_array_equal, assert_equal,
+from numpy.testing import (TestCase, assert_equal,
                            assert_almost_equal, assert_array_almost_equal,
                            assert_raises)
-from numpy.testing.decorators import knownfailureif
 
 import astropy.cosmology
 from astropy import units as u
 
-from NFW.nfw import  NFW
+from NFW.nfw import NFW
 
 
 class TestNFW(TestCase):
@@ -20,6 +19,11 @@ class TestNFW(TestCase):
         assert_raises(ValueError, NFW, 1e15, 5, 0, **{'size_type': "foo"})
         assert_raises(ValueError, NFW, 1e15, 5, 0,
                       **{'overdensity_type': "bar"})
+
+    def test_overdensity_init(self):
+        nfw = NFW(1e15, 4, 0.3, overdensity=500, overdensity_type="mean")
+        assert_equal(nfw.overdensity, 500)
+        assert (nfw.overdensity_type == "mean")
 
     def test_mass_init(self):
         m200 = 1e15 * u.solMass
@@ -130,6 +134,11 @@ class TestNFW(TestCase):
         nfw = NFW(m200, c, z)
         c500 = nfw.radius_Delta(500) / nfw.r_s
         assert_almost_equal(c500, [3.3051557218506047])
+        c500c = nfw.concentration(500)
+        assert_almost_equal(c500, c500c)
+        c500m = nfw.concentration(500, "mean")
+        assert_almost_equal(c500m, 4.592128764327895)
+        assert_almost_equal(nfw.concentration(), 5)
 
     def test_mass_consistency(self):
         m200 = 1e15
@@ -231,4 +240,10 @@ class TestNFW(TestCase):
         # Ensure that accessing the cosmology property also updates
         # the other properties.
         assert_almost_equal(nfw.radius_Delta(325).value, 1.2525923457595705)
+        # Now test that the r_s property correctly handels the update
         astropy.cosmology.default_cosmology.set(save_cosmo)
+        assert_almost_equal(nfw.r_s.value, 0.4457230268230224)
+        # And change the cosmology again to make sure that r_Delta handles
+        # the update correctly
+        astropy.cosmology.default_cosmology.set(wmap9)
+        assert_almost_equal(nfw.r_Delta.value, 1.573382494078073)
