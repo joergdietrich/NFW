@@ -17,10 +17,9 @@ class TestNFW(TestCase):
         astropy.cosmology.default_cosmology.set(cls._cosmo)
 
     def test_faulty_init(self):
-        assert_raises(ValueError, NFW, 1e15, 5, 0, 'size_type="foo"')
+        assert_raises(ValueError, NFW, 1e15, 5, 0, **{'size_type': "foo"})
         assert_raises(ValueError, NFW, 1e15, 5, 0,
-                      'size_type="mass"',
-                      'overdensity_type="bar"')
+                      **{'overdensity_type': "bar"})
 
     def test_mass_init(self):
         m200 = 1e15 * u.solMass
@@ -44,7 +43,7 @@ class TestNFW(TestCase):
         z = 0.3
         nfw = NFW(m200b, c, z, overdensity_type='mean')
         m200c = nfw.mass_Delta(200, overdensity_type='critical').value
-        assert_almost_equal(m200c/1e15, 2.062054316492159)
+        assert_almost_equal(m200c / 1e15, 2.062054316492159)
 
     def test_radius_Delta(self):
         m200 = 1e15
@@ -64,7 +63,7 @@ class TestNFW(TestCase):
         z = 0.3
         nfw = NFW(m200, c, z)
         m500 = nfw.mass_Delta(500)
-        assert_almost_equal(m500.value/1e14, 7.221140, 6)
+        assert_almost_equal(m500.value / 1e14, 7.221140, 6)
 
     def test_projected_mass(self):
         m200 = 1e15
@@ -89,7 +88,7 @@ class TestNFW(TestCase):
         z = 0.3
         nfw = NFW(m200, c, z)
         rho = nfw.density(1.23)
-        assert_almost_equal(rho.value/1e13, 2.628686177054833)
+        assert_almost_equal(rho.value / 1e13, 2.628686177054833)
 
     def test_mean_density(self):
         m200 = 1e15
@@ -97,7 +96,7 @@ class TestNFW(TestCase):
         z = 0.3
         nfw = NFW(m200, c, z)
         rho = nfw.mean_density(1.23)
-        assert_almost_equal(rho.value/1e13, 9.256897197704966)
+        assert_almost_equal(rho.value / 1e13, 9.256897197704966)
 
     def test_mess(self):
         m200 = 1e15
@@ -105,7 +104,7 @@ class TestNFW(TestCase):
         z = 0.3
         nfw = NFW(m200, c, z)
         m = nfw.mass(1.32)
-        assert_almost_equal(m.value/1e14, 7.656709240756399)
+        assert_almost_equal(m.value / 1e14, 7.656709240756399)
 
     def test_sigma(self):
         m200 = 1e15
@@ -113,7 +112,7 @@ class TestNFW(TestCase):
         z = 0.3
         nfw = NFW(m200, c, z)
         s = nfw.sigma(1.12)
-        assert_almost_equal(s.value/1e13, 8.418908648577666)
+        assert_almost_equal(s.value / 1e13, 8.418908648577666)
 
     def test_delta_sigma(self):
         m200 = 1e15
@@ -122,7 +121,7 @@ class TestNFW(TestCase):
         nfw = NFW(m200, c, z)
         ds = nfw.delta_sigma([0.1, 1.12])
         ref_arr = np.array([5.28752650, 1.38772723])
-        assert_array_almost_equal(ds.value/1e14, ref_arr)
+        assert_array_almost_equal(ds.value / 1e14, ref_arr)
 
     def test_concentration(self):
         m200 = 1e15
@@ -140,7 +139,7 @@ class TestNFW(TestCase):
         m500 = nfw.mass_Delta(500)
         c500 = nfw.radius_Delta(500) / nfw.r_s
         nfw2 = NFW(m500, c500, z, overdensity=500)
-        assert_almost_equal(nfw2.mass_Delta(200).value/1e14, m200/1e14)
+        assert_almost_equal(nfw2.mass_Delta(200).value / 1e14, m200 / 1e14)
 
     def test_radius_mass_consistency(self):
         m200 = 1e15
@@ -149,7 +148,7 @@ class TestNFW(TestCase):
         nfw = NFW(m200, c, z)
         r200 = nfw.radius_Delta(200)
         nfw2 = NFW(r200, c, z, size_type="radius")
-        assert_almost_equal(nfw2.mass_Delta(200).value/1e14, m200/1e14)
+        assert_almost_equal(nfw2.mass_Delta(200).value / 1e14, m200 / 1e14)
 
     def test_mass_unit_consistency(self):
         m200 = 5e14
@@ -168,7 +167,7 @@ class TestNFW(TestCase):
         z = 0.2
         nfw1 = NFW(r200, c, z, size_type='radius')
         nfw2 = NFW(r200 * u.Mpc, c, z, size_type='radius')
-        nfw3 = NFW(r200*1000 * u.kiloparsec, c, z, size_type='radius')
+        nfw3 = NFW(r200 * 1000 * u.kiloparsec, c, z, size_type='radius')
         m200_1 = nfw1.mass_Delta(200)
         m200_2 = nfw2.mass_Delta(200)
         m200_3 = nfw3.mass_Delta(200)

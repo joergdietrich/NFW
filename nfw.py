@@ -113,7 +113,7 @@ class NFW(object):
 
         if overdensity_type not in ['critical', 'mean']:
             raise ValueError("overdensity_type must be one of 'mean', "
-                             "'background'")
+                             "'critical'")
         self._overdensity_type = overdensity_type
 
         if size_type not in ['mass', 'radius']:
@@ -301,7 +301,7 @@ class NFW(object):
             rho = self.rho_c
         else:
             rho = self.rho_c * self.cosmology.Om(self.z)
-        return (self.mean_density(r) - Delta*rho).value
+        return (self.mean_density(r) - Delta * rho).value
 
     def radius_Delta(self, overdensity, overdensity_type=None):
         """Compute the radius which contains a given overdensity.
@@ -370,7 +370,7 @@ class NFW(object):
         """
         r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
-        return self.rho_c * self.delta_c/(x * (1+x)**2)
+        return self.rho_c * self.delta_c / (x * (1 + x)**2)
 
     def mean_density(self, r):
         """Compute the mean density inside a radius.
@@ -388,8 +388,8 @@ class NFW(object):
         """
         r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
-        return 3 * (1/x)**3 * self.delta_c * self.rho_c \
-            * (np.log((1 + x)) - x/(1 + x))
+        return 3 * (1 / x)**3 * self.delta_c * self.rho_c \
+            * (np.log((1 + x)) - x / (1 + x))
 
     def mass(self, r):
         """Compute the mass inside radius r.
@@ -408,7 +408,7 @@ class NFW(object):
         r = u.Quantity(r, u.Mpc)
         x = r / self.r_s
         return 4 * np.pi * self.delta_c * self.rho_c * self.r_s**3 \
-            * (np.log((1 + x)) - x/(1 + x))
+            * (np.log((1 + x)) - x / (1 + x))
 
     def projected_mass(self, r):
         """Compute the projected mass of the NFW profile inside a cylinder.
@@ -448,7 +448,7 @@ class NFW(object):
         x = r / self.r_s
         val1 = 1 / (x**2 - 1)
         val2 = (arcsec(x) / (sm.sqrt(x**2 - 1))**3).real
-        return 2 * self.r_s * self.rho_c * self.delta_c * (val1-val2)
+        return 2 * self.r_s * self.rho_c * self.delta_c * (val1 - val2)
 
     def delta_sigma(self, r):
         """Compute the surface mass density minus its mean at radius r.
