@@ -113,7 +113,7 @@ class NFW(object):
 
         if overdensity_type not in ['critical', 'mean']:
             raise ValueError("overdensity_type must be one of 'mean', "
-                             "'background'")
+                             "'critical'")
         self._overdensity_type = overdensity_type
 
         if size_type not in ['mass', 'radius']:
