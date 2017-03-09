@@ -1,8 +1,7 @@
 import numpy as np
-from numpy.testing import (TestCase, assert_array_equal, assert_equal,
+from numpy.testing import (TestCase, assert_equal,
                            assert_almost_equal, assert_array_almost_equal,
                            assert_raises)
-from numpy.testing.decorators import knownfailureif
 
 import astropy.cosmology
 from astropy import units as u
@@ -135,6 +134,11 @@ class TestNFW(TestCase):
         nfw = NFW(m200, c, z)
         c500 = nfw.radius_Delta(500) / nfw.r_s
         assert_almost_equal(c500, [3.3051557218506047])
+        c500c = nfw.concentration(500)
+        assert_almost_equal(c500, c500c)
+        c500m = nfw.concentration(500, "mean")
+        assert_almost_equal(c500m, 4.592128764327895)
+        assert_almost_equal(nfw.concentration(), 5)
 
     def test_mass_consistency(self):
         m200 = 1e15
