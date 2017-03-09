@@ -20,15 +20,16 @@ matrix:
 
     # Try a few older versions for old python
     - python: 2.7
-      env: NUMPY=1.10
+      env: NUMPY=1.10 SCIPY=0.17 ASTROPY=1.1
     - python: 2.7      
-      env: NUMPY=1.9
+      env: NUMPY=1.9 SCIPY=0.17 ASTROPY=1.0
     - python: 2.7      
-      env: SCIPY=0.12
-    - python: 2.7      
-      env: ASTROPY=1.0
-    
+      env: NUMPY=1.9 SCIPY=0.14 ASTROPY=1.0
+
     - python: 3.5
+
+    - python: 3.5
+      env: ASTROPY=1.2
 
     - python: 3.6
 
