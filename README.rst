@@ -14,6 +14,17 @@ Class instances can be created at different overdensities. As such
 the class allows for easy conversion between masses and concentration
 parameters between different mass definitions.
 
+Surface mass density and differential surface mass density methods are
+available for weak lensing applications.
+
+Installation
+------------
+
+The easiest way to install the NFW module is to use pip::
+  
+  $ pip install NFW
+
+
 Dependencies
 ------------
 
@@ -30,9 +41,22 @@ Author
 
 Jörg Dietrich astro@joergdietrich.com
 
+Contributing
+------------
+
+Development takes place on GitHub_. Please report any bugs as an issue in the
+GitHub issue tracker.
+
+License
+-------
+
+NFW is released under an MIT license. See LICENCE.txt
+
+
 .. |Build Status| image:: https://travis-ci.org/joergdietrich/NFW.svg?branch=master
    :target: https://travis-ci.org/joergdietrich/NFW
 .. |Coverage Status| image:: https://coveralls.io/repos/github/joergdietrich/NFW/badge.svg?branch=master
    :target: https://coveralls.io/github/joergdietrich/NFW?branch=master
 .. |DOI| image:: https://zenodo.org/badge/doi/10.5281/zenodo.50664.svg
    :target: http://dx.doi.org/10.5281/zenodo.50664
+.. _GitHub: https://github.com/joergdietrich/NFW
