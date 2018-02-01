@@ -2,20 +2,17 @@
 
 from __future__ import division
 
-import sys
-
 import numpy as np
 from scipy import optimize as opt
 
 from astropy import units as u
-from astropy import cosmology
 
 
 def _diff_c(c1, c0, delta_ratio):
     return _delta_fac(c0) / _delta_fac(c1) - delta_ratio * (c0 / c1)**3
 
 
-def _findc(c0, overdensity):
+def _findc(c0, overdensity):  # type: (float, float) -> float
     delta_ratio = 200 / overdensity
     return opt.brentq(_diff_c, .01, 1000, args=(c0, delta_ratio))
 
