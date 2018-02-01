@@ -2,7 +2,10 @@ language: python
 sudo: false
 
 env:
-
+  global:
+    ASTROPY=2.0.3
+    NUMPY=1.13.3
+    SCIPY=1.0.0
     
 matrix:
   include:
