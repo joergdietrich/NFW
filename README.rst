@@ -32,9 +32,11 @@ This implementation of the NFW halo properties depends on
 
 -  numpy >= 1.9
 -  scipy >= 0.16
--  astropy >= 1.0
+-  astropy >= 2.0
 
-Older versions may work but are untested.
+Older versions may work but are untested. In particular astropy > 1.0 is
+known to work but the unit tests will fail because astropy-2.0 updated
+physical constants from CODATA 2010 to CODATA 2014.
 
 Author
 ------
