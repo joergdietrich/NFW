@@ -1,4 +1,6 @@
 *~
 *.pyc
 .coverage
-
+NFW.egg-info
+dist
+build
