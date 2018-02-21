@@ -107,7 +107,7 @@ def mdelta_to_m200(m, func, overdensity, args=()):
         # brentq will fail for identical
         return m_in
     m_min = u.Quantity(1e5, u.solMass)
-    m_max = u.Quantity(1e25, u.solMass)
+    m_max = u.Quantity(1e20, u.solMass)
     mdelta = opt.brentq(_find_m200, m_min.value, m_max.value,
                         args=(func, overdensity, m_in) + args)
     return u.Quantity(mdelta, u.solMass)
