@@ -1,4 +1,4 @@
-Copyright (c) 2013-2017, Jörg Dietrich <astro@joergdietrich.com>
+Copyright (c) 2013-2022, Jörg Dietrich <astro@joergdietrich.com>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

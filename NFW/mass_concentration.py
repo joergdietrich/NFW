@@ -216,3 +216,34 @@ def duffy_concentration(m200, z, cosmo):
     m_pivot = u.Quantity(2e12, u.solMass)
     conc = a * (m200 / m_pivot)**b * (1 + z)**c
     return conc.value
+
+
+def de_boni_concentration(m200, z, cosmo):
+    """
+    Compute the concentration of the De Boni et al. (2013) M-c relation for
+    free A, B, all halos.
+
+    Parameters:
+    ===========
+
+    m200: float, array_like, or astropy.Quantity
+        Mass of halo at 200rho_crit, [Msun] if float
+    z: float or array_like
+        Halo redshift
+    cosmo: astropy.cosmology
+
+    Returns:
+    ========
+    conc: float or array
+        Halo concentration
+    """
+
+    m200 = np.asanyarray(m200)
+    z = np.asanyarray(z)
+    m200 = u.Quantity(m200 * cosmo.h, u.solMass)
+    a = 3.62
+    b = -0.007
+    c = -0.32
+    m_pivot = u.Quantity(2e12, u.solMass)
+    conc = a * (m200 / m_pivot)**b * (1 + z)**c
+    return conc.value
