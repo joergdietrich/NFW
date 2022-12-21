@@ -4,3 +4,4 @@
 NFW.egg-info
 dist
 build
+.tox
