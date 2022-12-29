@@ -1,33 +1,88 @@
-name: Python package
+name: "Test Suite"
 
-on: [push]
+on: 
+  push:
+  pull-request:
 
 jobs:
-  build:
+  tests:
+    name: "Python ${{ matrix.python-version }} on ${{ matrix.os }}"
+    runs-on: "${{ matrix.os }}"
 
-    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        python-version:
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - name: "Check out the repo"
+        uses: "actions/checkout@v2"
+
+      - name: "Set up Python"
+        uses: "actions/setup-python@v2"
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+          python-version: "${{ matrix.python-version }}"
+
+      - name: "Install dependencies"
         run: |
-          python -m pip install --upgrade pip
-          pip install flake8 pytest
-          pip install tox
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Lint with flake8
+          python -m pip install tox tox-gh-actions
+
+      - name: "Run tox for ${{ matrix.python-version }}"
         run: |
-          # stop the build if there are Python syntax errors or undefined names
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      - name: Run tox
+          python -m tox
+
+      - name: "Upload coverage data"
+        uses: actions/upload-artifact@v3
+        with:
+          name: covdata
+          path: .coverage.*
+
+  coverage:
+    name: Coverage
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Check out the repo"
+        uses: "actions/checkout@v2"
+
+      - name: "Set up Python"
+        uses: "actions/setup-python@v2"
+        with:
+          python-version: "3.10"
+
+      - name: "Install dependencies"
         run: |
-          tox -e py
+          python -m pip install tox tox-gh-actions
+
+      - name: "Download coverage data"
+        uses: actions/download-artifact@v3
+        with:
+          name: covdata
+
+      - name: "Combine"
+        run: |
+          python -m tox -e coverage
+          export TOTAL=$(python -c "import json;print(json.load(open('coverage.json'))['totals']['percent_covered_display'])")
+          echo "total=$TOTAL" >> $GITHUB_ENV
+          echo "### Total coverage: ${TOTAL}%" >> $GITHUB_STEP_SUMMARY
+
+      - name: "Make badge"
+        uses: schneegans/dynamic-badges-action@v1.4.0
+        with:
+          # GIST_TOKEN is a GitHub personal access token with scope "gist".
+          auth: ${{ secrets.GIST_TOKEN }}
+          gistID: fdfe01f268aa013bfbc3f426b2fce781
+          filename: covbadge.json
+          label: Coverage
+          message: ${{ env.total }}%
+          minColorRange: 50
+          maxColorRange: 90
+          valColorRange: ${{ env.total }}
