@@ -33,7 +33,7 @@ jobs:
 
       - name: "Install dependencies"
         run: |
-          python -m pip install tox tox-gh-actions
+          python -m pip install tox tox-gh-actions coverage
 
       - name: "Run tox for ${{ matrix.python-version }}"
         run: |
@@ -60,7 +60,7 @@ jobs:
 
       - name: "Install dependencies"
         run: |
-          python -m pip install tox tox-gh-actions
+          python -m pip install tox tox-gh-actions coverage
 
       - name: "Download coverage data"
         uses: actions/download-artifact@v3
