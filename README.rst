@@ -57,8 +57,7 @@ NFW is released under an MIT license. See LICENCE.txt
 
 .. |Build Status| image:: https://img.shields.io/github/actions/workflow/status/joergdietrich/NFW/main.yml
    :target: https://github.com/joergdietrich/NFW/actions
-.. |Coverage Status| image:: https://coveralls.io/repos/github/joergdietrich/NFW/badge.svg?branch=master
-   :target: https://coveralls.io/github/joergdietrich/NFW?branch=master
+.. |Coverage Status| image:: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/joergdietrich/fdfe01f268aa013bfbc3f426b2fce781/raw/covbadge.json
 .. |DOI| image:: https://zenodo.org/badge/doi/10.5281/zenodo.50664.svg
    :target: http://dx.doi.org/10.5281/zenodo.50664
 .. _GitHub: https://github.com/joergdietrich/NFW
