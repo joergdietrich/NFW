@@ -206,7 +206,7 @@ class TestNFW(TestCase):
                                 nfw3.radius_Delta(200).value,
                                 err_msg=
                                 "Disagreement after changing cosmology")
-        except:
+        except:  # pragma: no cover
             astropy.cosmology.default_cosmology.set(save_cosmo)
             raise
         astropy.cosmology.default_cosmology.set(save_cosmo)
@@ -232,7 +232,7 @@ class TestNFW(TestCase):
         astropy.cosmology.default_cosmology.set(wmap9)
         try:
             assert(nfw.cosmology is wmap9)
-        except:
+        except:  # pragma: no cover
             astropy.cosmology.default_cosmology.set(save_cosmo)
             raise
         # Ensure that accessing the cosmology property also updates
