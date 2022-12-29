@@ -55,8 +55,8 @@ License
 NFW is released under an MIT license. See LICENCE.txt
 
 
-.. |Build Status| image:: https://travis-ci.org/joergdietrich/NFW.svg?branch=master
-   :target: https://travis-ci.org/joergdietrich/NFW
+.. |Build Status| image:: https://img.shields.io/github/actions/workflow/status/joergdietrich/NFW/main.yml
+   :target: https://github.com/joergdietrich/NFW/actions
 .. |Coverage Status| image:: https://coveralls.io/repos/github/joergdietrich/NFW/badge.svg?branch=master
    :target: https://coveralls.io/github/joergdietrich/NFW?branch=master
 .. |DOI| image:: https://zenodo.org/badge/doi/10.5281/zenodo.50664.svg
